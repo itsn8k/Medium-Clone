@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Medium: Read and write stories</title>
+</head>
+<link rel="stylesheet" href="/output.css">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+<body class="bg-gray-100">
+
+  <div class="flex min-h-screen">
+    <!-- Left Side: Registration Form -->
+    <div class="w-full md:w-1/2 flex items-center justify-center bg-gray-50">
+      <div class="max-w-md w-full space-y-8 p-8">
+        <div class="text-center">
+          <!-- Medium Logo -->
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" alt="Medium Logo" class="mx-auto h-8 w-10">
+          <h2 class="mt-4 text-3xl font-extrabold text-gray-900">Create Your Account</h2>
+          <p class="mt-2 text-sm text-gray-600">Join us to start sharing your stories.</p>
+        </div>
+
+        <!-- Registration Form -->
+        <form action="/signup" method="post" class="mt-8 space-y-6">
+          <div class="rounded-md shadow-sm space-y-4">
+            <div>
+              <label for="name" class="sr-only">Name</label>
+              <input id="name" name="name" type="text" required
+                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                placeholder="Name">
+            </div>
+            <div>
+              <label for="username" class="sr-only">Username</label>
+              <input id="username" name="username" type="text" required
+                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                placeholder="Username">
+            </div>
+            <div>
+              <label for="email" class="sr-only">Email address</label>
+              <input id="email" name="email" type="email" required
+                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                placeholder="Email address">
+            </div>
+            <div>
+              <label for="password" class="sr-only">Password</label>
+              <input id="password" name="password" type="password" required
+                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                placeholder="Password">
+            </div>
+            <div>
+              <label for="gender" class="sr-only">Gender</label>
+              <select id="gender" name="gender" required
+                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm">
+                <option value="" disabled selected>Select your gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div>
+            <button type="submit" class="group relative w-full flex justify-center py-4 px-6 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+              Sign Up
+            </button>
+          </div>
+        </form>
+
+        <!-- Sign In Link -->
+        <p class="mt-4 text-center text-sm text-gray-600">
+          Already have an account? 
+          <a href="/" class="font-medium text-black hover:text-gray-700">Sign In</a>
+        </p>
+      </div>
+    </div>
+
+   <!-- Right Side: Image (Hidden on Mobile) -->
+<div class="hidden md:flex w-1/2 bg-cover bg-center items-center justify-center"
+     style="background-image: url('https://images.unsplash.com/photo-1504376379689-8d54347b26c6?q=80&w=1436&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+  <div class="text-center">
+    <blockquote>
+      <p class="text-4xl font-semibold text-white italic leading-relaxed drop-shadow-lg">
+        “Your Stories Await.”
+      </p>
+    </blockquote>
+  </div>
+</div>
+   
+    
+</body>
+</html>

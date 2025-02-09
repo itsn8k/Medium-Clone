@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medium: User Dashboard.</title>
+    <link rel="stylesheet" href="/output.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<!-- component -->
+<nav class=" bg-white w-full flex relative justify-between items-center mx-auto px-8 h-20">
+    <!-- logo -->
+    <div class="inline-flex">
+    <a class="_o6689fn" href="#">
+        <div class="hidden md:block">
+            <!-- Replace the SVG with an image logo for desktop -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Medium_logo_Wordmark_Black.svg/380px-Medium_logo_Wordmark_Black.svg.png?20170829134410" alt="Logo" width="122" height="32" style="display: block">
+        </div>
+        <div class="block md:hidden">
+            <!-- Replace the small SVG with a smaller image logo for mobile -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Medium_logo_Wordmark_Black.svg/380px-Medium_logo_Wordmark_Black.svg.png?20170829134410" alt="Logo" width="120" height="32" style="display: block">
+        </div>
+    </a>
+</div>
+
+
+    <!-- end logo -->
+
+    <!-- search bar -->
+<div class="hidden sm:block flex-shrink flex-grow-0 justify-start px-2">
+    <div class="inline-block">
+        <div class="inline-flex items-center max-w-full">
+            <div class="flex items-center flex-grow-0 flex-shrink pl-2 relative w-60 border rounded-full px-1 py-1">
+                <input
+                    type="text"
+                    placeholder="Search"
+                    class="block flex-grow flex-shrink overflow-hidden outline-none bg-transparent w-full pl-2"
+                />
+                <div class="flex items-center justify-center relative h-8 w-8 rounded-full">
+                    <button type="submit" class="flex items-center justify-center">
+                        <svg
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            role="presentation"
+                            focusable="false"
+                            style="
+                                display: block;
+                                fill: none;
+                                height: 12px;
+                                width: 12px;
+                                stroke: currentcolor;
+                                stroke-width: 5.33333;
+                                overflow: visible;
+                            "
+                        >
+                            <g fill="none">
+                                <path
+                                    d="m13 24c6.0751322 0 11-4.9248678 11-11 0-6.07513225-4.9248678-11-11-11-6.07513225 0-11 4.92486775-11 11 0 6.0751322 4.92486775 11 11 11zm8-3 9 9"
+                                ></path>
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end search bar -->
+
+
+    <!-- login -->
+    <div class="flex-initial">
+      <div class="flex justify-end items-center relative">
+       
+        <div class="flex mr-4 items-center">
+          <a class="inline-block py-2 px-3" href="/upload">
+           <div class="flex items-center relative cursor-pointer whitespace-nowrap bg-black text-white px-3 py-1 rounded">Write</div>
+          </a>
+        </div>
+
+        <div class="block">
+            <div class="inline relative">
+                <a class="inline-flex items-center relative px-2 border rounded-full hover:shadow-lg" href="/dashboard">
+                    <div class="pl-1">
+                        <svg
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            role="presentation"
+                            focusable="false"
+                            style="display: block; fill: none; height: 16px; width: 16px; stroke: currentcolor; stroke-width: 3; overflow: visible;"
+                        >
+                            <g fill="none" fill-rule="nonzero">
+                                <path d="m2 16h28"></path>
+                                <path d="m2 24h28"></path>
+                                <path d="m2 8h28"></path>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="block flex-grow-0 flex-shrink-0 h-10 w-12 pl-5">
+                        <svg
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                            role="presentation"
+                            focusable="false"
+                            style="display: block; height: 100%; width: 100%; fill: currentcolor;"
+                        >
+                            <path d="m16 .7c-8.437 0-15.3 6.863-15.3 15.3s6.863 15.3 15.3 15.3 15.3-6.863 15.3-15.3-6.863-15.3-15.3-15.3zm0 28c-4.021 0-7.605-1.884-9.933-4.81a12.425 12.425 0 0 1 6.451-4.4 6.507 6.507 0 0 1 -3.018-5.49c0-3.584 2.916-6.5 6.5-6.5s6.5 2.916 6.5 6.5a6.513 6.513 0 0 1 -3.019 5.491 12.42 12.42 0 0 1 6.452 4.4c-2.328 2.925-5.912 4.809-9.933 4.809z"></path>
+                        </svg>
+                    </div>
+                  </a>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- end login -->
+</nav>
+<hr class="my-6 border-t border-gray-300 mx-5" />
+<!--dashboard Starts-->
+<section class="ezy__epprofile1_xCHwujzh py-14 md:py-24 bg-white text-zinc-900 relative overflow-hidden z-10">
+  <div class="container px-4 mx-auto">
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- sidebar -->
+      <div class="w-full md:w-1/3">
+        <div class="bg-white shadow-xl py-6">
+          <h5 class="text-xl font-bold mx-4 mb-4">Account</h5>
+
+          <ul class="flex flex-wrap flex-col">
+            <li class="px-4 py-2 opacity-80 border-l-4 border-black hover:text-black bg-gray-200">
+              <a href="/home">Overview</a>
+            </li>
+            <li class="px-4 py-2 opacity-80 hover:text-black hover:bg-gray-200 duration-500 cursor-pointer">
+              <a href="/post">Post</a>
+            </li>
+
+            <hr class="my-2 mx-4 opacity-60" />
+             <li class="px-4 py-2 opacity-80 hover:text-black hover:bg-gray-200 duration-500 cursor-pointer">
+              <a href="#!">Setting</a>
+            </li>
+           <li class="px-4 py-2 opacity-80 hover:text-black hover:bg-gray-200 duration-500 cursor-pointer">
+            <a href="/logout">Logout</a>
+          </li>
+
+
+            <hr class="my-2 mx-4 opacity-60" />
+          </ul>
+        </div>
+
+       <!-- Published Blogs Section -->
+<div class="bg-white shadow-xl text-center p-6 px-4 md:px-6 mt-6">
+  <!-- Published Blogs Counter -->
+  <p class="text-md font-semibold mb-2">Published Blogs</p>
+  <p class="text-6xl font-bold text-black"><%= postCount %></p>
+</div>
+
+
+      </div>
+
+      <!-- profile -->
+      <div class="w-full md:w-2/3">
+        <div class="bg-white shadow-xl p-6">
+          <div class="flex items-center relative">
+  <!-- File Input Field -->
+  <label for="profile-picture" class="flex items-center cursor-pointer">
+    <div class="relative w-16 h-16">
+      <img
+        id="profile-image"
+        src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg"
+        alt="Profile Picture"
+        class="w-full h-full object-cover rounded-full"
+      />
+      <input
+        id="profile-picture"
+        type="file"
+        class="absolute opacity-0 cursor-pointer w-full h-full"
+      />
+    </div>
+  </label>
+  
+  <!-- User Name -->
+  <h6 class="text-[22px] font-bold ml-4"><%= userName %></h6>
+</div>
+
+
+          <div class="grid grid-cols-4 gap-1 mt-6">
+            <div class="col-span-2 sm:col-span-1 text-center">
+              <a href="" class="group">
+                <!-- <div class="mb-2 text-3xl opacity-25 group-hover:text-black group-hover:opacity-100 duration-500">
+                  <i class="fas fa-heart"></i>
+                </div> -->
+                <p class="text-[17px]"><%= userEmail %></p>
+              </a>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1 text-center">
+              <a href="" class="group">
+                <!-- <div class="mb-2 text-3xl opacity-25 group-hover:text-black group-hover:opacity-100 duration-500">
+                  <i class="fas fa-users"></i>
+                </div> -->
+                <p class="text-[17px]"><%= userGender %></p>
+              </a>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1 text-center">
+              <a href="" class="group">
+                <!-- <div class="mb-2 text-3xl opacity-25 group-hover:text-black group-hover:opacity-100 duration-500">
+                  <i class="fas fa-clock"></i>
+                </div> -->
+                <p class="text-[17px]"><%= userUsername %></p>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white shadow-xl p-6 mt-4">
+          <div class="flex items-center justify-between">
+            <h6 class="text-[22px] font-bold ml-4">Settings</h6>
+            <a href="/dashboard" class="opacity-50 ml-2 small hover:text-black hover:opacity-100">View All <i class="fas fa-chevron-right"></i></a>
+          </div>
+
+          <hr class="my-5 mx-4 opacity-60" />
+
+          <div class="grid grid-cols-4 gap-6 my-6">
+            <div class="col-span-2 sm:col-span-1 text-center">
+              <a href="/post">
+                <div class="text-4xl text-black mb-4">
+                  <i class='bx bx-edit'></i>
+                </div>
+                <p class="text-[17px]">Post</p>
+              </a>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1 text-center">
+              <a href="/dashboard">
+                <div class="text-4xl text-black mb-4">
+                  <i class='bx bx-cog' ></i>
+                </div>
+                <p class="text-[17px]">Settings</p>
+              </a>
+            </div>
+
+           
+
+
+            <div class="col-span-2 sm:col-span-1 text-center">
+              <a href="/logout">
+                <div class="text-4xl text-black mb-4">
+                  <i class='bx bx-log-out'></i>
+                </div>
+                <p class="text-[17px]">Logout</p>
+              </a>
+            </div>
+          </div>
+
+          <hr class="my-5 mx-4 opacity-60" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--dashboard Ends-->
+
+<!--footer start-->
+<!-- Join Us Section -->
+<section class="bg-black">
+  <div class="max-w-lg bg-black px-4 pt-24 py-8 mx-auto text-left md:max-w-none md:text-center">
+    <h1 class="text-3xl font-extrabold leading-10 tracking-tight text-white text-center sm:leading-none md:text-6xl lg:text-7xl">
+      <span class="inline md:block">Medium</span>
+      <!-- <span class="mt-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-emerald-400 to-green-500 md:inline-block">
+        Stories
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 via-cyan-400 to-purple-300">Await</span>
+      </span> -->
+    </h1>
+
+    <div class="mx-auto rounded-lg font-black mt-5 text-zinc-400 md:mt-12 md:max-w-lg text-center lg:text-lg">
+    <a href="/post" class="bg-tkb border text-sm text-white py-3 px-7 rounded-full">
+      Write Blog
+    </a>
+</div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="text-white mx-5" />
+
+<!-- Footer Section -->
+<footer class="bg-black pb-5">
+  <div class="max-w-screen-xl px-4 pt-8 mx-auto sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center sm:justify-between">
+      <!-- Logo Section -->
+      <a class="flex justify-center text-teal-300 sm:justify-start" href="/dashboard">
+        <img class="rounded-full" src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" width="40" height="40" alt="Logo" />
+      </a>
+
+      <!-- Links Section -->
+     <p class="mt-4 text-sm text-center text-gray-400 lg:text-right lg:mt-0">
+      <a href="/dashboard" class="text-gray-400 hover:text-white">T&C</a> &nbsp; 
+      <a href="/dashboard" class="text-gray-400 hover:text-white">Career</a> &nbsp; 
+      <a href="/dashboard" class="text-gray-400 hover:text-white">Privacy & Policy</a> &nbsp; 
+      <a href="/dashboard" class="text-gray-400 hover:text-white">Developers</a>
+    </p>
+
+    </div>
+  </div>
+</footer>
+
+<!--footer end-->
+
+
+  
+</body>
+</html>

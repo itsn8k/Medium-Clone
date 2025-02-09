@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+</head>
+<link rel="stylesheet" href="/output.css">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+ <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <!-- Modal Background -->
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+        <!-- Modal Content -->
+        <div class="bg-white rounded-lg shadow-md max-w-sm w-full p-4">
+            <!-- Error Icon -->
+            <div class="flex justify-center mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+
+            <!-- Error Message -->
+            <h1 class="text-lg font-medium text-gray-900 text-center mb-2">Error</h1>
+            <p class="text-gray-600 text-center mb-4 text-sm">
+                An error occurred during sign-up. Please try again.
+            </p>
+
+              <!-- Link to Signup Page -->
+            <div class="flex justify-center">
+                 <a href="/signup" class="px-3 py-1 bg-gray-100 text-black rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black text-xs">
+                    Try Again
+                </a>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
