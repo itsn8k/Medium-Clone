@@ -13,7 +13,7 @@ const app = express();
 const dbURI = "mongodb://127.0.0.1:27017/main-blog";
 
 // Connect to MongoDB
-mongoose
+mongodb: mongoose
   .connect(dbURI)
   .then(() => {
     console.log("Connected Successfully");
@@ -27,14 +27,13 @@ mongoose
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-
 // Configure session middleware
 app.use(
   session({ secret: "secret-key", resave: false, saveUninitialized: true })
 );
 
 // Use method-override middleware
-app.use(methodOverride('_method'));
+app.use(methodOverride("_method"));
 
 // Configure body parsers
 app.use(express.urlencoded({ extended: false }));
@@ -200,11 +199,11 @@ app.get("/dashboard", async (req, res) => {
     console.error("Error retrieving user data:", err);
     res.render("error", {
       title: "Error",
-      message: "An error occurred while retrieving your data. Please try again.",
+      message:
+        "An error occurred while retrieving your data. Please try again.",
     });
   }
 });
-
 
 // Blog Route with Category and Search Filtering
 app.get("/blog", async (req, res) => {
@@ -224,7 +223,7 @@ app.get("/blog", async (req, res) => {
       filter.$or = [
         { title: { $regex: searchQuery, $options: "i" } },
         { body: { $regex: searchQuery, $options: "i" } },
-        { snippet: { $regex: searchQuery, $options: "i" } }
+        { snippet: { $regex: searchQuery, $options: "i" } },
       ];
     }
 
@@ -237,7 +236,7 @@ app.get("/blog", async (req, res) => {
       userName: req.session.user ? req.session.user.name : "Guest",
       blogs: blogs || [], // If no blogs, pass an empty array
       selectedCategory, // Pass selected category back to view
-      searchQuery // Pass search query back to view
+      searchQuery, // Pass search query back to view
     });
   } catch (err) {
     console.error("Error fetching blog posts:", err);
@@ -247,12 +246,6 @@ app.get("/blog", async (req, res) => {
     });
   }
 });
-
-
-
-
-
-
 
 // Blog Post Route
 app.post("/blog", upload.single("image"), async (req, res) => {
@@ -280,27 +273,25 @@ app.post("/blog", upload.single("image"), async (req, res) => {
     });
 
     await newBlogPost.save();
-    
+
     // Render the success page
     res.render("bs", {
       title: "Blog Post Created",
       message: "Blog post created successfully!",
-      redirectUrl: "/blog" // URL to redirect after showing the message (if needed)
+      redirectUrl: "/blog", // URL to redirect after showing the message (if needed)
     });
   } catch (err) {
     console.error("Error creating blog post:", err);
-    
+
     // Render the error page
     res.render("er", {
       title: "Error",
-      message: "An error occurred while creating the blog post. Please try again.",
-      redirectUrl: "/blog" // URL to redirect after showing the message (if needed)
+      message:
+        "An error occurred while creating the blog post. Please try again.",
+      redirectUrl: "/blog", // URL to redirect after showing the message (if needed)
     });
   }
 });
-
-
-
 
 // Route to fetch and display a single blog post
 app.get("/blog/:id", async (req, res) => {
@@ -339,18 +330,17 @@ app.get("/blog/:id", async (req, res) => {
   }
 });
 
-
 // Route to delete a blog post
-app.delete('/blog/:id', async (req, res) => {
+app.delete("/blog/:id", async (req, res) => {
   try {
     const blogId = req.params.id;
     const userId = req.session.userId;
 
     // Ensure that the blogId is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(blogId)) {
-      return res.status(400).render('error', {
-        title: 'Invalid Blog ID',
-        message: 'The provided blog ID is invalid.',
+      return res.status(400).render("error", {
+        title: "Invalid Blog ID",
+        message: "The provided blog ID is invalid.",
       });
     }
 
@@ -359,17 +349,17 @@ app.delete('/blog/:id', async (req, res) => {
 
     // Check if the post exists
     if (!blogPost) {
-      return res.status(404).render('error', {
-        title: 'Blog Post Not Found',
-        message: 'The requested blog post does not exist.',
+      return res.status(404).render("error", {
+        title: "Blog Post Not Found",
+        message: "The requested blog post does not exist.",
       });
     }
 
     // Check if the current user is the author of the post
     if (blogPost.user.toString() !== userId.toString()) {
-      return res.status(403).render('error', {
-        title: 'Unauthorized',
-        message: 'You are not authorized to delete this post.',
+      return res.status(403).render("error", {
+        title: "Unauthorized",
+        message: "You are not authorized to delete this post.",
       });
     }
 
@@ -377,12 +367,12 @@ app.delete('/blog/:id', async (req, res) => {
     await BlogPost.findByIdAndDelete(blogId);
 
     // Redirect or render success message
-    res.redirect('/blog');
+    res.redirect("/blog");
   } catch (err) {
-    console.error('Error deleting blog post:', err);
-    res.status(500).render('error', {
-      title: 'Error',
-      message: 'An error occurred while deleting the blog post.',
+    console.error("Error deleting blog post:", err);
+    res.status(500).render("error", {
+      title: "Error",
+      message: "An error occurred while deleting the blog post.",
     });
   }
 });
@@ -404,18 +394,24 @@ app.get("/blog/:id/edit", async (req, res) => {
     const blogPost = await BlogPost.findById(req.params.id).lean();
 
     if (!blogPost) {
-      return res.status(404).render("error", { message: "Blog post not found." });
+      return res
+        .status(404)
+        .render("error", { message: "Blog post not found." });
     }
 
     // Ensure only the author can edit the post
     if (blogPost.user.toString() !== req.session.userId.toString()) {
-      return res.status(403).render("error", { message: "You do not have permission to edit this post." });
+      return res
+        .status(403)
+        .render("error", {
+          message: "You do not have permission to edit this post.",
+        });
     }
 
     // Render the edit form
     res.render("index-4", {
       title: "Edit Blog Post",
-      blogPost
+      blogPost,
     });
   } catch (err) {
     console.error("Error fetching blog post:", err);
@@ -423,61 +419,72 @@ app.get("/blog/:id/edit", async (req, res) => {
   }
 });
 
-
-
 // Middleware to ensure user is authenticated
 function isAuthenticated(req, res, next) {
   if (req.session.userId) {
     return next();
   }
-  res.redirect('/login');
+  res.redirect("/login");
 }
 
 // PUT route to handle the blog post update
-app.put("/blog/:id", upload.single("image"), isAuthenticated, async (req, res) => {
-  try {
-    const { title, snippet, body } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+app.put(
+  "/blog/:id",
+  upload.single("image"),
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { title, snippet, body } = req.body;
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // Find the blog post by its ID
-    const blogPost = await BlogPost.findById(req.params.id);
+      // Find the blog post by its ID
+      const blogPost = await BlogPost.findById(req.params.id);
 
-    // If the blog post is not found, return a 404 error
-    if (!blogPost) {
-      return res.status(404).render("error", { message: "Blog post not found." });
+      // If the blog post is not found, return a 404 error
+      if (!blogPost) {
+        return res
+          .status(404)
+          .render("error", { message: "Blog post not found." });
+      }
+
+      // Check if the user is the author of the post
+      if (blogPost.user.toString() !== req.session.userId.toString()) {
+        return res
+          .status(403)
+          .render("error", {
+            message: "You do not have permission to edit this post.",
+          });
+      }
+
+      // Update the blog post
+      blogPost.title = title;
+      blogPost.snippet = snippet;
+      blogPost.body = body;
+
+      // If a new image is uploaded, update the image
+      if (image) {
+        blogPost.image = image;
+      }
+
+      await blogPost.save();
+
+      // Redirect to home or previous page
+      const redirectUrl = req.query.redirect || "/";
+      res.redirect(redirectUrl);
+    } catch (err) {
+      console.error("Error updating blog post:", err);
+      res.render("error", {
+        message:
+          "An error occurred while updating the blog post. Please try again.",
+      });
     }
-
-    // Check if the user is the author of the post
-    if (blogPost.user.toString() !== req.session.userId.toString()) {
-      return res.status(403).render("error", { message: "You do not have permission to edit this post." });
-    }
-
-    // Update the blog post
-    blogPost.title = title;
-    blogPost.snippet = snippet;
-    blogPost.body = body;
-
-    // If a new image is uploaded, update the image
-    if (image) {
-      blogPost.image = image;
-    }
-
-    await blogPost.save();
-
-    // Redirect to home or previous page
-    const redirectUrl = req.query.redirect || "/";
-    res.redirect(redirectUrl);
-  } catch (err) {
-    console.error("Error updating blog post:", err);
-    res.render("error", { message: "An error occurred while updating the blog post. Please try again." });
   }
-});
+);
 
 // GET route for home page
 app.get("/", (req, res) => {
   res.render("home", { user: req.session.userId });
 });
-
 
 app.get("/user", (req, res) => {
   if (req.session.userId) {
@@ -488,16 +495,5 @@ app.get("/user", (req, res) => {
     res.render("home");
   }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = details;
