@@ -17,7 +17,7 @@ mongodb: mongoose
   .connect(dbURI)
   .then(() => {
     console.log("Connected Successfully");
-    app.listen(3000);
+    app.listen(5000);
   })
   .catch((err) => {
     console.log("Database error: " + err);
@@ -401,11 +401,9 @@ app.get("/blog/:id/edit", async (req, res) => {
 
     // Ensure only the author can edit the post
     if (blogPost.user.toString() !== req.session.userId.toString()) {
-      return res
-        .status(403)
-        .render("error", {
-          message: "You do not have permission to edit this post.",
-        });
+      return res.status(403).render("error", {
+        message: "You do not have permission to edit this post.",
+      });
     }
 
     // Render the edit form
@@ -449,11 +447,9 @@ app.put(
 
       // Check if the user is the author of the post
       if (blogPost.user.toString() !== req.session.userId.toString()) {
-        return res
-          .status(403)
-          .render("error", {
-            message: "You do not have permission to edit this post.",
-          });
+        return res.status(403).render("error", {
+          message: "You do not have permission to edit this post.",
+        });
       }
 
       // Update the blog post
