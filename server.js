@@ -9,19 +9,22 @@ const details = require("./models/details");
 const BlogPost = require("./models/blog"); // Ensure this model is correctly defined
 const app = express();
 
+// Dynamic port handling
+const PORT = process.env.PORT || 5000;
+
 // Database URI
 const dbURI = "mongodb://127.0.0.1:27017/main-blog";
 
 // Connect to MongoDB
-mongodb: mongoose
-  .connect(dbURI)
+mongoose
+  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("Connected Successfully");
-    app.listen(5000);
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
   })
-  .catch((err) => {
-    console.log("Database error: " + err);
-  });
+  .catch((err) => console.error("Database connection error:", err));
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
