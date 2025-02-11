@@ -13,7 +13,7 @@ const app = express();
 const dbURI = "mongodb://127.0.0.1:27017/main-blog";
 
 // Connect to MongoDB
-mongodb: mongoose
+mongoose
   .connect(dbURI)
   .then(() => {
     console.log("Connected Successfully");
