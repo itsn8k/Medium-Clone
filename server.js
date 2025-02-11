@@ -10,7 +10,8 @@ const BlogPost = require("./models/blog"); // Ensure this model is correctly def
 const app = express();
 
 // Database URI
-const dbURI = "mongodb://127.0.0.1:27017/main-blog";
+const dbURI =
+  "mongodb+srv://Jonathan:admin123@cluster.y7axs.mongodb.net/main-blog";
 
 // Connect to MongoDB
 mongoose
