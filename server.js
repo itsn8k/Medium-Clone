@@ -18,7 +18,7 @@ const dbURI =
 
 // Connect to MongoDB
 mongoose
-  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(dbURI) // No need for deprecated options
   .then(() => {
     console.log("Connected Successfully");
     app.listen(PORT, () => {
