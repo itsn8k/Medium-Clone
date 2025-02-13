@@ -3,263 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medium: Read and write stories.</title>
+    <title><%= blogPost.title %> | Medium</title>
     <link rel="stylesheet" href="/output.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<!-- component -->
-<nav class=" bg-white w-full flex relative justify-between items-center mx-auto px-8 h-20">
-    <!-- logo -->
-    <div class="inline-flex">
-    <a class="_o6689fn" href="#">
-        <div class="hidden md:block">
-            <!-- Replace the SVG with an image logo for desktop -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Medium_logo_Wordmark_Black.svg/380px-Medium_logo_Wordmark_Black.svg.png?20170829134410" alt="Logo" width="122" height="32" style="display: block">
-        </div>
-        <div class="block md:hidden">
-            <!-- Replace the small SVG with a smaller image logo for mobile -->
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Medium_logo_Wordmark_Black.svg/380px-Medium_logo_Wordmark_Black.svg.png?20170829134410" alt="Logo" width="120" height="32" style="display: block">
-        </div>
-    </a>
-</div>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
+        <div class="max-w-screen-xl mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="/blog" class="flex items-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" 
+                         alt="Medium Logo" 
+                         class="h-8 w-8">
+                </a>
 
-
-    <!-- end logo -->
-
-    <!-- search bar -->
-<div class="hidden sm:block flex-shrink flex-grow-0 justify-start px-2">
-    <div class="inline-block">
-        <div class="inline-flex items-center max-w-full">
-            <div class="flex items-center flex-grow-0 flex-shrink pl-2 relative w-60 border rounded-full px-1 py-1">
-                <input
-                    type="text"
-                    placeholder="Search"
-                    class="block flex-grow flex-shrink overflow-hidden outline-none bg-transparent w-full pl-2"
-                />
-                <div class="flex items-center justify-center relative h-8 w-8 rounded-full">
-                    <button type="submit" class="flex items-center justify-center">
-                        <svg
-                            viewBox="0 0 32 32"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            role="presentation"
-                            focusable="false"
-                            style="
-                                display: block;
-                                fill: none;
-                                height: 12px;
-                                width: 12px;
-                                stroke: currentcolor;
-                                stroke-width: 5.33333;
-                                overflow: visible;
-                            "
-                        >
-                            <g fill="none">
-                                <path
-                                    d="m13 24c6.0751322 0 11-4.9248678 11-11 0-6.07513225-4.9248678-11-11-11-6.07513225 0-11 4.92486775-11 11 0 6.0751322 4.92486775 11 11 11zm8-3 9 9"
-                                ></path>
-                            </g>
+                <!-- Right side buttons -->
+                <div class="flex items-center space-x-6">
+                    <% if (currentUserId && blogPost.user.toString() === currentUserId.toString()) { %>
+                        <a href="/blog/<%= blogPost._id %>/edit" 
+                           class="text-gray-600 hover:text-black transition-colors">
+                            <span class="sr-only">Edit post</span>
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </a>
+                        <form action="/blog/<%= blogPost._id %>?_method=DELETE" 
+                              method="POST" 
+                              class="inline"
+                              onsubmit="return confirm('Are you sure you want to delete this post?');">
+                            <button type="submit" class="text-gray-600 hover:text-red-600 transition-colors">
+                                <span class="sr-only">Delete post</span>
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </form>
+                    <% } %>
+                    <a href="/blog" class="text-gray-600 hover:text-black transition-colors">
+                        <span class="sr-only">Back to blog</span>
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<!-- end search bar -->
+    </nav>
 
+    <!-- Main Content Container -->
+    <div class="container mx-auto max-w-4xl px-4 pt-20">
+        <!-- Article Header -->
+        <header class="py-12 space-y-8">
+            <!-- Category Tag -->
+            <div class="flex justify-center">
+                <span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                    <%= blogPost.type %>
+                </span>
+            </div>
 
-    <!-- login -->
-    <div class="flex-initial">
-      <div class="flex justify-end items-center relative">
-       
-        <div class="flex mr-4 items-center">
-          <a class="inline-block py-2 px-3" href="/post">
-           <div class="flex items-center relative cursor-pointer whitespace-nowrap bg-black text-white px-3 py-1 rounded">Write</div>
-          </a>
-        </div>
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center leading-tight max-w-3xl mx-auto">
+                <%= blogPost.title %>
+            </h1>
 
-        <div class="block">
-            <div class="inline relative">
-                <a class="inline-flex items-center relative px-2 border rounded-full hover:shadow-lg" href="/dashboard">
-                    <div class="pl-1">
-                        <svg
-                            viewBox="0 0 32 32"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            role="presentation"
-                            focusable="false"
-                            style="display: block; fill: none; height: 16px; width: 16px; stroke: currentcolor; stroke-width: 3; overflow: visible;"
-                        >
-                            <g fill="none" fill-rule="nonzero">
-                                <path d="m2 16h28"></path>
-                                <path d="m2 24h28"></path>
-                                <path d="m2 8h28"></path>
-                            </g>
-                        </svg>
+            <!-- Author Info -->
+            <div class="flex items-center justify-center space-x-4">
+                <div class="flex items-center space-x-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" 
+                         alt="Author" 
+                         class="h-12 w-12 rounded-full border-2 border-white shadow-sm">
+                    <div class="text-left">
+                        <p class="text-base font-semibold text-gray-900"><%= blogPost.author %></p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <time datetime="<%= blogPost.createdAt %>">
+                                <%= new Date(blogPost.createdAt).toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                }) %>
+                            </time>
+                            <span class="mx-2">·</span>
+                            <span><%= Math.ceil(blogPost.body.split(' ').length / 200) %> min read</span>
+                        </div>
                     </div>
-
-                    <div class="block flex-grow-0 flex-shrink-0 h-10 w-12 pl-5">
-                        <svg
-                            viewBox="0 0 32 32"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            role="presentation"
-                            focusable="false"
-                            style="display: block; height: 100%; width: 100%; fill: currentcolor;"
-                        >
-                            <path d="m16 .7c-8.437 0-15.3 6.863-15.3 15.3s6.863 15.3 15.3 15.3 15.3-6.863 15.3-15.3-6.863-15.3-15.3-15.3zm0 28c-4.021 0-7.605-1.884-9.933-4.81a12.425 12.425 0 0 1 6.451-4.4 6.507 6.507 0 0 1 -3.018-5.49c0-3.584 2.916-6.5 6.5-6.5s6.5 2.916 6.5 6.5a6.513 6.513 0 0 1 -3.019 5.491 12.42 12.42 0 0 1 6.452 4.4c-2.328 2.925-5.912 4.809-9.933 4.809z"></path>
-                        </svg>
-                    </div>
-                  </a>
+                </div>
             </div>
+        </header>
+
+        <!-- Featured Image -->
+        <div class="mb-12 rounded-2xl overflow-hidden shadow-xl">
+            <img src="<%= blogPost.image %>" 
+                 alt="<%= blogPost.title %>" 
+                 class="w-full h-[400px] md:h-[500px] object-cover">
         </div>
-      </div>
+
+        <!-- Article Content -->
+        <article class="mx-auto max-w-2xl space-y-8 pb-24">
+            <!-- Snippet/Introduction -->
+            <p class="text-xl md:text-2xl text-gray-600 leading-relaxed border-l-4 border-gray-200 pl-6">
+                <%= blogPost.snippet %>
+            </p>
+
+            <!-- Main Content -->
+            <div class="prose prose-lg prose-gray max-w-none space-y-6">
+                <%= blogPost.body.split('\n').join('<br>') %>
+            </div>
+        </article>
     </div>
-    <!-- end login -->
-</nav>
-<hr class="my-6 border-t border-gray-300 mx-5" />
-<!-- Post Starts -->
-<section class="ezy__blogdetails1_awTjykch py-5 bg-white text-zinc-900">
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 gap-4">
-      <div class="col-span-1">
-        <!-- Dynamic Image -->
-       <div class="flex justify-center">
-        <img src="<%= blogPost.image %>" alt="<%= blogPost.title %>" class="w-75 h-auto rounded" />
-      </div>
 
-    <div class="border border-black bg-white p-6 rounded-lg text-center mt-6 max-w-3xl mx-auto px-4">
-    <!-- Blog Title -->
-    <h1 class="text-2xl font-bold mb-4">
-      <%= blogPost.title %>
-    </h1>
+    <!-- Share Section -->
+    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-xl px-6 py-3 flex items-center space-x-6">
+        <!-- Like Button -->
+        <button 
+            id="likeButton" 
+            class="text-gray-500 hover:text-red-600 transition-colors flex items-center space-x-2"
+            data-blog-id="<%= blogPost._id %>"
+            data-liked="<%= blogPost.likes && blogPost.likes.includes(currentUserId) ? 'true' : 'false' %>"
+        >
+            <svg class="h-7 w-7" fill="<%= blogPost.likes && blogPost.likes.includes(currentUserId) ? 'currentColor' : 'none' %>" 
+                 stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span id="likeCount" class="text-sm font-medium">
+                <%= blogPost.likes ? blogPost.likes.length : 0 %>
+            </span>
+        </button>
 
-    <!-- Blog Snippet -->
-    <p class="text-lg font-semibold mb-4 opacity-80">
-      <%= blogPost.snippet %>
-    </p>
-
-    <!-- Blog Body -->
-    <p class="text-[16px] mb-4 opacity-80 leading-relaxed">
-      <%= blogPost.body %>
-    </p>
-  </div>
-
-
-
-
-
-
-
-        <div class="flex flex-col sm:flex-row items-center justify-between my-8">
-          <div class="flex flex-col sm:flex-row items-center">
-            <div class="mr-2">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg"
-                alt="<%= blogPost.author %>"
-                class="max-w-full h-auto rounded-full border border-btnBorder"
-                width="40"
-              />
-            </div>
-            <div>
-              <p>By <b><%= blogPost.author %></b></p>
-            </div>
-            <p class="ml-3 mt-3 sm:mt-0"><%= new Date(blogPost.createdAt).toLocaleString() %></p>
-          </div>
-          <div class="flex space-x-4">
-    <!-- Check if the current user is the author of the post -->
-    <% if (blogPost.user && currentUserId && blogPost.user.toString() === currentUserId.toString()) { %>
-        <!-- Delete Button Form -->
-        <form action="/blog/<%= blogPost._id %>?_method=DELETE" method="POST" class="inline">
-            <button 
-                type="submit" 
-                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-                Delete
-            </button>
-        </form>
-    <% } %>
-
-    <!-- Update Button Form -->
-    <% if (blogPost.user.toString() === currentUserId.toString()) { %>
-        <form action="/blog/<%= blogPost._id %>/edit" method="GET" class="inline">
-            <button 
-                type="submit" 
-                class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-600"
-            >
-                Update
-            </button>
-        </form>
-    <% } %>
-</div>
-
+        <!-- Views Counter -->
+        <div class="flex items-center space-x-2 text-gray-500">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <span id="viewCount" class="text-sm font-medium">
+                <%= blogPost.views || 0 %>
+            </span>
         </div>
-        <!-- <div>
-          <p class="text-[16px] mb-2 opacity-80">
-            <%= blogPost.body %>
-          </p>
-        </div> -->
-      </div>
+
+        <!-- Share Button -->
+        <button 
+            id="shareButton" 
+            class="text-gray-500 hover:text-green-600 transition-colors"
+            data-tooltip="Copy link"
+        >
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+            </svg>
+        </button>
+
+        <!-- Share Success Message -->
+        <div id="shareMessage" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg opacity-0 transition-opacity duration-300">
+            Link copied to clipboard!
+        </div>
     </div>
-  </div>
-</section>
-<!-- Post Ends -->
 
+    <style>
+        /* Typography and Spacing */
+        .prose {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #374151;
+        }
+        
+        .prose p {
+            margin-bottom: 2em;
+            white-space: pre-line;
+        }
 
+        .prose img {
+            border-radius: 1rem;
+            margin: 2.5em 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .prose {
+                font-size: 1.0625rem;
+                line-height: 1.75;
+            }
 
-<!--footer start-->
-<!-- Join Us Section -->
-<section class="bg-black">
-  <div class="max-w-lg bg-black px-4 pt-24 py-8 mx-auto text-left md:max-w-none md:text-center">
-    <h1 class="text-3xl font-extrabold leading-10 tracking-tight text-white text-center sm:leading-none md:text-6xl lg:text-7xl">
-      <span class="inline md:block">Medium</span>
-      <!-- <span class="mt-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-emerald-400 to-green-500 md:inline-block">
-        Stories
-        <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 via-cyan-400 to-purple-300">Await</span>
-      </span> -->
-    </h1>
+            .container {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
+        }
 
-    <div class="mx-auto rounded-lg font-black mt-5 text-zinc-400 md:mt-12 md:max-w-lg text-center lg:text-lg">
-    <a href="/post" class="bg-tkb border text-sm text-white py-3 px-7 rounded-full">
-      Write Blog
-    </a>
-</div>
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
 
-    </div>
-  </div>
-</section>
+        /* Better text rendering */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-<hr class="text-white mx-5" />
+        /* Add to your existing styles */
+        [data-tooltip] {
+            position: relative;
+        }
 
-<!-- Footer Section -->
-<footer class="bg-black pb-5">
-  <div class="max-w-screen-xl px-4 pt-8 mx-auto sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center sm:justify-between">
-      <!-- Logo Section -->
-      <a class="flex justify-center text-teal-300 sm:justify-start" href="/dashboard">
-        <img class="rounded-full" src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" width="40" height="40" alt="Logo" />
-      </a>
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem;
+            background-color: black;
+            color: white;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+            white-space: nowrap;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 
-      <!-- Links Section -->
-     <p class="mt-4 text-sm text-center text-gray-400 lg:text-right lg:mt-0">
-      <a href="/dashboard" class="text-gray-400 hover:text-white">T&C</a> &nbsp; 
-      <a href="/dashboard" class="text-gray-400 hover:text-white">Career</a> &nbsp; 
-      <a href="/dashboard" class="text-gray-400 hover:text-white">Privacy & Policy</a> &nbsp; 
-      <a href="/dashboard" class="text-gray-400 hover:text-white">Developers</a>
-    </p>
+    <!-- Add this script before closing body tag -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const likeButton = document.getElementById('likeButton');
+        const likeCount = document.getElementById('likeCount');
+        const shareButton = document.getElementById('shareButton');
+        const shareMessage = document.getElementById('shareMessage');
+        const blogId = likeButton.dataset.blogId;
 
-    </div>
-  </div>
-</footer>
+        // Increment view count on page load
+        fetch(`/blog/${blogId}/view`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('viewCount').textContent = data.views;
+            });
 
-<!--footer end-->
+        // Handle likes
+        likeButton.addEventListener('click', function() {
+            fetch(`/blog/${blogId}/like`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    likeCount.textContent = data.likes;
+                    const svg = likeButton.querySelector('svg');
+                    if (data.isLiked) {
+                        svg.setAttribute('fill', 'currentColor');
+                        likeButton.classList.add('text-red-600');
+                    } else {
+                        svg.setAttribute('fill', 'none');
+                        likeButton.classList.remove('text-red-600');
+                    }
+                });
+        });
 
-
-  
+        // Handle share button
+        shareButton.addEventListener('click', function() {
+            // Copy current URL to clipboard
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                // Show success message
+                shareMessage.classList.add('opacity-100');
+                setTimeout(() => {
+                    shareMessage.classList.remove('opacity-100');
+                }, 2000);
+            });
+        });
+    });
+    </script>
 </body>
 </html>
