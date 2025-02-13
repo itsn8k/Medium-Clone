@@ -22,7 +22,7 @@
       <div class="flex items-center justify-center min-h-screen">
         <blockquote class="text-center">
             <p class="text-4xl font-semibold text-white italic leading-relaxed">
-            “Your Stories Await.”
+            "Your Stories Await."
             </p>
         </blockquote>
       </div>
@@ -36,6 +36,13 @@
         <div class="flex justify-center">
           <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" alt="Medium Logo" class="mx-auto h-12 w-12">
         </div>
+        
+        <!-- Add this after the Medium Logo and before the form -->
+        <% if (locals.error) { %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline"><%= error %></span>
+          </div>
+        <% } %>
         
         <div>
           <h2 class="text-3xl font-extrabold text-gray-900 text-center">Sign In to Your Account</h2>
@@ -62,8 +69,14 @@
           <!-- Remember Me and Submit -->
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
-              <label for="remember_me" class="ml-2 text-sm text-gray-900">Remember me</label>
+              <input id="remember_me" 
+                     name="remember_me" 
+                     type="checkbox" 
+                     value="1"
+                     class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
+              <label for="remember_me" class="ml-2 text-sm text-gray-900">
+                Remember me
+              </label>
             </div>
 
             <div class="text-sm">

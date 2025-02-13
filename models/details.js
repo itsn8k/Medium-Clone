@@ -28,6 +28,10 @@ const detailsSchema = new Schema(
       enum: ["male", "female", "other"], // Restrict to specific values
       required: true,
     },
+    rememberToken: {
+      type: String,
+      default: null
+    }
   },
   { timestamps: true }
 );

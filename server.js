@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const path = require("path");
 const bcrypt = require("bcrypt");
@@ -8,32 +10,78 @@ const multer = require("multer");
 const details = require("./models/details");
 const BlogPost = require("./models/blog"); // Ensure this model is correctly defined
 const app = express();
+const fs = require('fs');
+const cookieParser = require('cookie-parser');
 
 // Dynamic port handling
 const PORT = process.env.PORT || 5000;
 
-// Database URI
-const dbURI =
-  "mongodb+srv://Jonathan:admin123@cluster.y7axs.mongodb.net/main-blog";
+// Database URI - Make sure this is your correct connection string
+const dbURI = process.env.MONGODB_URI;
 
-// Connect to MongoDB
-mongoose
-  .connect(dbURI) // No need for deprecated options
-  .then(() => {
-    console.log("Connected Successfully");
+// Updated MongoDB connection configuration
+mongoose.connect(dbURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+})
+.then(() => {
+    console.log("Connected Successfully to MongoDB");
+    console.log("Database Name:", mongoose.connection.name);
+    console.log("Host:", mongoose.connection.host);
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+        console.log(`Server is running on port ${PORT}`);
     });
-  })
-  .catch((err) => console.error("Database connection error:", err));
+})
+.catch((err) => {
+    console.error("MongoDB connection error details:");
+    console.error("Error name:", err.name);
+    console.error("Error message:", err.message);
+    console.error("Full error:", err);
+    process.exit(1);
+});
+
+// Add connection error handler
+mongoose.connection.on('error', err => {
+    console.error('MongoDB connection error:', err);
+});
+
+// Add disconnection handler
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected');
+});
+
+// Handle process termination
+process.on('SIGINT', async () => {
+    try {
+        await mongoose.connection.close();
+        console.log('MongoDB connection closed through app termination');
+        process.exit(0);
+    } catch (err) {
+        console.error('Error closing MongoDB connection:', err);
+        process.exit(1);
+    }
+});
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
 // Configure session middleware
+app.use(cookieParser());
 app.use(
-  session({ secret: "secret-key", resave: false, saveUninitialized: true })
+  session({
+    secret: process.env.SESSION_SECRET || "secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax'
+    }
+  })
 );
 
 // Use method-override middleware
@@ -46,22 +94,129 @@ app.use(express.json());
 // Configure view engine
 app.set("view engine", "ejs");
 
+// Add this before configuring multer
+const uploadDir = path.join(__dirname, "public/uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "public/uploads")); // Ensure this directory exists
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext); // Unique filename
-  },
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        // Add file type validation
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.mimetype)) {
+            return cb(new Error('Invalid file type'), false);
+        }
+        const ext = path.extname(file.originalname);
+        cb(null, `${Date.now()}${ext}`);
+    }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
+
+// Add this after your multer configuration
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        // A Multer error occurred when uploading
+        console.error("Multer error:", err);
+        return res.render("er", {
+            title: "Upload Error",
+            message: "An error occurred while uploading the image. Please try again.",
+            redirectUrl: "/blog"
+        });
+    } else if (err) {
+        // An unknown error occurred
+        console.error("Unknown error:", err);
+        return res.render("er", {
+            title: "Error",
+            message: "An unexpected error occurred. Please try again.",
+            redirectUrl: "/blog"
+        });
+    }
+    next();
+});
+
+// Move this section up, before any routes that use requireAuth
+// Add authentication middleware for protected routes
+const requireAuth = async (req, res, next) => {
+  try {
+    // Check if user is authenticated via session
+    if (req.session.userId) {
+      return next();
+    }
+
+    // Check if user has a valid remember token
+    if (req.cookies.remember_token) {
+      const user = await details.findOne({
+        rememberToken: req.cookies.remember_token
+      });
+
+      if (user) {
+        // Set up the session
+        req.session.userId = user._id;
+        req.session.user = user;
+        return next();
+      }
+    }
+
+    // If no valid session or remember token, redirect to signin
+    res.redirect('/?error=Please sign in to continue');
+  } catch (err) {
+    console.error("Auth middleware error:", err);
+    res.redirect('/?error=Authentication error');
+  }
+};
+
+// Add CSRF protection middleware
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = !!req.session.userId;
+  res.locals.currentUser = req.session.user;
+  next();
+});
 
 // Routes
-app.get("/", (req, res) => {
-  res.render("signin", { title: "Medium: Read and write stories" });
+app.get("/", async (req, res) => {
+  try {
+    // Check if user is already authenticated via session
+    if (req.session.userId) {
+      return res.redirect("/blog");
+    }
+
+    // Check if user has a valid remember token
+    if (req.cookies.remember_token) {
+      const user = await details.findOne({
+        rememberToken: req.cookies.remember_token
+      });
+
+      if (user) {
+        // Set up the session
+        req.session.userId = user._id;
+        req.session.user = user;
+        return res.redirect("/blog");
+      }
+    }
+
+    // If no valid session or remember token, show signin page
+    res.render("signin", { 
+      title: "Medium: Read and write stories",
+      error: req.query.error 
+    });
+  } catch (err) {
+    console.error("Authentication check error:", err);
+    res.render("signin", { 
+      title: "Medium: Read and write stories",
+      error: "An error occurred. Please try again." 
+    });
+  }
 });
 
 app.get("/signup", (req, res) => {
@@ -90,7 +245,7 @@ app.get("/view", (req, res) => {
   res.render("index-2", { title: "Medium: Read and write stories" });
 });
 
-app.get("/post", (req, res) => {
+app.get("/post", requireAuth, async (req, res) => {
   res.render("index-5", { title: "Medium: Read and write stories" });
 });
 app.get("/home", (req, res) => {
@@ -144,7 +299,7 @@ app.post("/signup", async (req, res) => {
 
 // Sign-in Route
 app.post("/signin", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, remember_me } = req.body;
 
   try {
     const user = await details.findOne({ email });
@@ -163,8 +318,28 @@ app.post("/signin", async (req, res) => {
       });
     }
 
+    // Set up the session
     req.session.userId = user._id;
     req.session.user = user;
+
+    // If remember me is checked, set a persistent cookie
+    if (remember_me) {
+      // Create a secure token
+      const rememberToken = await bcrypt.hash(user._id.toString(), 10);
+      
+      // Save the token to the user in the database
+      await details.findByIdAndUpdate(user._id, {
+        rememberToken: rememberToken
+      });
+
+      // Set a cookie that expires in 30 days
+      res.cookie('remember_token', rememberToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
+      });
+    }
+
     res.redirect("/blog");
   } catch (err) {
     console.error("Sign-in error:", err);
@@ -175,8 +350,29 @@ app.post("/signin", async (req, res) => {
   }
 });
 
+// Add a new middleware to check for remember_token cookie
+app.use(async (req, res, next) => {
+  if (!req.session.userId && req.cookies.remember_token) {
+    try {
+      // Find user with matching remember token
+      const user = await details.findOne({
+        rememberToken: req.cookies.remember_token
+      });
+
+      if (user) {
+        // Set up the session
+        req.session.userId = user._id;
+        req.session.user = user;
+      }
+    } catch (err) {
+      console.error('Auto-login error:', err);
+    }
+  }
+  next();
+});
+
 // Dashboard Route
-app.get("/dashboard", async (req, res) => {
+app.get("/dashboard", requireAuth, async (req, res) => {
   const userId = req.session.userId;
 
   try {
@@ -210,7 +406,7 @@ app.get("/dashboard", async (req, res) => {
 });
 
 // Blog Route with Category and Search Filtering
-app.get("/blog", async (req, res) => {
+app.get("/blog", requireAuth, async (req, res) => {
   try {
     const searchQuery = req.query.search || ""; // Get search query
     const selectedCategory = req.query.category || ""; // Get selected category
@@ -253,48 +449,47 @@ app.get("/blog", async (req, res) => {
 
 // Blog Post Route
 app.post("/blog", upload.single("image"), async (req, res) => {
-  try {
-    const { title, snippet, body, type } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    try {
+        const { title, snippet, body, type } = req.body;
+        let imagePath = null;
 
-    console.log("Image path:", image); // Log the image path to debug
+        if (req.file) {
+            // Store the path relative to the public directory
+            imagePath = `/uploads/${req.file.filename}`;
+            console.log("Uploaded image path:", imagePath);
+        }
 
-    if (!req.session.userId) {
-      return res.render("error", {
-        title: "Unauthorized",
-        message: "You must be logged in to post a blog.",
-      });
+        if (!req.session.userId) {
+            return res.render("error", {
+                title: "Unauthorized",
+                message: "You must be logged in to post a blog."
+            });
+        }
+
+        const newBlogPost = new BlogPost({
+            title,
+            snippet,
+            body,
+            type,
+            image: imagePath, // Use the relative path
+            user: req.session.userId,
+            author: req.session.user.name
+        });
+
+        await newBlogPost.save();
+        res.render("bs", {
+            title: "Blog Post Created",
+            message: "Blog post created successfully!",
+            redirectUrl: "/blog"
+        });
+    } catch (err) {
+        console.error("Error creating blog post:", err);
+        res.render("er", {
+            title: "Error",
+            message: "An error occurred while creating the blog post. Please try again.",
+            redirectUrl: "/blog"
+        });
     }
-
-    const newBlogPost = new BlogPost({
-      title,
-      snippet,
-      body,
-      type,
-      image,
-      user: req.session.userId,
-      author: req.session.user.name,
-    });
-
-    await newBlogPost.save();
-
-    // Render the success page
-    res.render("bs", {
-      title: "Blog Post Created",
-      message: "Blog post created successfully!",
-      redirectUrl: "/blog", // URL to redirect after showing the message (if needed)
-    });
-  } catch (err) {
-    console.error("Error creating blog post:", err);
-
-    // Render the error page
-    res.render("er", {
-      title: "Error",
-      message:
-        "An error occurred while creating the blog post. Please try again.",
-      redirectUrl: "/blog", // URL to redirect after showing the message (if needed)
-    });
-  }
 });
 
 // Route to fetch and display a single blog post
@@ -382,14 +577,29 @@ app.delete("/blog/:id", async (req, res) => {
 });
 
 // Logout Route
-app.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error during logout:", err);
-      return res.redirect("/home"); // Redirect to the blog page on error
+app.get("/logout", async (req, res) => {
+  try {
+    if (req.session.userId) {
+      // Clear the remember token in the database
+      await details.findByIdAndUpdate(req.session.userId, {
+        rememberToken: null
+      });
     }
-    res.redirect("/"); // Redirect to the login page after successful logout
-  });
+    
+    // Clear the cookie
+    res.clearCookie('remember_token');
+    
+    // Destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error during logout:", err);
+      }
+      res.redirect("/");
+    });
+  } catch (err) {
+    console.error("Logout error:", err);
+    res.redirect("/");
+  }
 });
 
 // GET route to display the edit form
@@ -421,66 +631,6 @@ app.get("/blog/:id/edit", async (req, res) => {
   }
 });
 
-// Middleware to ensure user is authenticated
-function isAuthenticated(req, res, next) {
-  if (req.session.userId) {
-    return next();
-  }
-  res.redirect("/login");
-}
-
-// PUT route to handle the blog post update
-app.put(
-  "/blog/:id",
-  upload.single("image"),
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { title, snippet, body } = req.body;
-      const image = req.file ? `/uploads/${req.file.filename}` : null;
-
-      // Find the blog post by its ID
-      const blogPost = await BlogPost.findById(req.params.id);
-
-      // If the blog post is not found, return a 404 error
-      if (!blogPost) {
-        return res
-          .status(404)
-          .render("error", { message: "Blog post not found." });
-      }
-
-      // Check if the user is the author of the post
-      if (blogPost.user.toString() !== req.session.userId.toString()) {
-        return res.status(403).render("error", {
-          message: "You do not have permission to edit this post.",
-        });
-      }
-
-      // Update the blog post
-      blogPost.title = title;
-      blogPost.snippet = snippet;
-      blogPost.body = body;
-
-      // If a new image is uploaded, update the image
-      if (image) {
-        blogPost.image = image;
-      }
-
-      await blogPost.save();
-
-      // Redirect to home or previous page
-      const redirectUrl = req.query.redirect || "/";
-      res.redirect(redirectUrl);
-    } catch (err) {
-      console.error("Error updating blog post:", err);
-      res.render("error", {
-        message:
-          "An error occurred while updating the blog post. Please try again.",
-      });
-    }
-  }
-);
-
 // GET route for home page
 app.get("/", (req, res) => {
   res.render("home", { user: req.session.userId });
@@ -493,6 +643,85 @@ app.get("/user", (req, res) => {
   } else {
     // User is not logged in, render home page without user-specific data
     res.render("home");
+  }
+});
+
+// PUT route to handle blog post updates
+app.put("/blog/:id", upload.single("image"), requireAuth, async (req, res) => {
+  try {
+    const { title, snippet, body } = req.body;
+    const blogId = req.params.id;
+
+    // Validate blogId
+    if (!mongoose.Types.ObjectId.isValid(blogId)) {
+      return res.status(400).render("error", {
+        title: "Invalid Blog ID",
+        message: "The provided blog ID is invalid."
+      });
+    }
+
+    // Find the blog post
+    const blogPost = await BlogPost.findById(blogId);
+
+    // Check if post exists
+    if (!blogPost) {
+      return res.status(404).render("error", {
+        title: "Not Found",
+        message: "Blog post not found."
+      });
+    }
+
+    // Verify ownership
+    if (blogPost.user.toString() !== req.session.userId.toString()) {
+      return res.status(403).render("error", {
+        title: "Unauthorized",
+        message: "You do not have permission to edit this post."
+      });
+    }
+
+    // Prepare update data
+    const updateData = {
+      title,
+      snippet,
+      body
+    };
+
+    // Handle image upload if provided
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+      
+      // Delete old image if it exists
+      if (blogPost.image) {
+        const oldImagePath = path.join(__dirname, 'public', blogPost.image);
+        try {
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlinkSync(oldImagePath);
+          }
+        } catch (err) {
+          console.error('Error deleting old image:', err);
+        }
+      }
+    }
+
+    // Update the blog post
+    const updatedPost = await BlogPost.findByIdAndUpdate(
+      blogId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedPost) {
+      throw new Error('Failed to update blog post');
+    }
+
+    // Redirect to the updated blog post
+    res.redirect(`/blog/${blogId}`);
+  } catch (err) {
+    console.error('Error updating blog post:', err);
+    res.render("error", {
+      title: "Error",
+      message: "An error occurred while updating the blog post."
+    });
   }
 });
 
