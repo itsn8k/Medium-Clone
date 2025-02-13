@@ -113,95 +113,274 @@
 <hr class="my-6 border-t border-gray-300 mx-5" />
 
 <!--Upload Section Starts-->
-<section class="ezy__blog_upload py-14 md:py-24 bg-white text-zinc-900 relative overflow-hidden z-10">
-  <div class="container px-4 mx-auto">
-    <div class="grid grid-cols-12 gap-6">
-      <!-- Sidebar (optional) -->
-      <div class="col-span-12 md:col-span-3 lg:col-span-2">
-        <div class="bg-white shadow-2xl flex md:flex-col items-center justify-center">
-          <div class="text-center w-full py-6 hover:bg-black hover:text-white duration-500 cursor-pointer">
-            <div class="text-3xl">
-              <i class="fas fa-user"></i>
-            </div>
-            <p class="text-xl font-bold mt-2">Profile</p>
-          </div>
-          <div class="text-center w-full py-6 hover:bg-black hover:text-white duration-500 cursor-pointer">
-            <div class="text-3xl">
-              <i class="fas fa-file-alt"></i>
-            </div>
-            <p class="text-xl font-bold mt-2">My Blogs</p>
-          </div>
-          <div class="text-center w-full py-6 bg-black text-white duration-500 cursor-pointer">
-            <div class="text-3xl">
-              <i class="fas fa-edit"></i>
-            </div>
-            <p class="text-xl font-bold mt-2">Create Blog</p>
-          </div>
-        </div>
+<section class="py-14 md:py-24 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-sm p-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Create Your Story</h1>
+        <p class="mt-2 text-gray-600">Share your thoughts with the world</p>
       </div>
 
-      <!-- Blog Form -->
-      <div class="col-span-12 md:col-span-9 lg:col-span-10">
-        <div class="bg-white shadow-2xl rounded-xl p-6 py-12">
-          <h3 class="text-3xl md:text-[40px] font-bold text-black leading-tight mb-6">
-            Create New Blog
-          </h3>
-
-          <form action="/blog" method="POST" enctype="multipart/form-data">
-            <!-- Blog Image Upload -->
-            <div class="mt-6">
-              <label for="image" class="text-[17px] leading-tight font-bold mb-2 block">Upload Blog Image</label>
-              <input type="file" name="image" id="image" class="h-12 w-full bg-gray-100 rounded-xl border-none focus:outline-none py-2 px-3" />
+      <form action="/blog" method="POST" enctype="multipart/form-data" class="space-y-8" id="blogForm">
+        <!-- Image Upload -->
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">
+                Cover Image
+                <span class="text-red-500">*</span>
+                <span class="text-xs text-gray-500 ml-1">(required)</span>
+            </label>
+            <div 
+                class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl transition-colors"
+                id="dropZone"
+            >
+                <div class="space-y-1 text-center">
+                    <div id="imagePreview" class="hidden mb-4">
+                        <img src="" alt="Preview" class="mx-auto h-32 w-auto">
+                    </div>
+                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="flex text-sm text-gray-600">
+                        <label class="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                            <span>Upload a file</span>
+                            <input 
+                                type="file" 
+                                name="image" 
+                                class="sr-only" 
+                                accept="image/*" 
+                                id="imageInput"
+                                required
+                            >
+                        </label>
+                        <p class="pl-1">or drag and drop</p>
+                    </div>
+                    <p class="text-xs text-gray-500" id="fileInfo">PNG, JPG, GIF up to 5MB</p>
+                    <div id="imageError" class="text-sm text-red-500 hidden mt-2">
+                        Please select an image for your story
+                    </div>
+                </div>
             </div>
-
-            <!-- Blog Type -->
-            <div class="mt-6">
-              <label for="type" class="text-[17px] leading-tight font-bold mb-2 block">Select Blog Type</label>
-              <select name="type" id="type" class="h-12 w-full bg-gray-100 rounded-xl border-none focus:outline-none py-2 px-3">
-                <option value="Tech & Gadgets">Tech & Gadgets</option>
-                <option value="News">News</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="Health & Wellness">Health & Wellness</option>
-                <option value="Food & Recipes">Food & Recipes</option>
-                <option value="Travel">Travel</option>
-                <option value="Personal Finance">Personal Finance</option>
-                <option value="Fashion & Beauty">Fashion & Beauty</option>
-                <option value="Education & Tutorials">Education & Tutorials</option>
-                <option value="Business & Entrepreneurship">Business & Entrepreneurship</option>
-                <option value="Entertainment & Pop Culture">Entertainment & Pop Culture</option>
-              </select>
-            </div>
-
-            <!-- Blog Title -->
-            <div class="mt-6">
-              <label for="title" class="text-[17px] leading-tight font-bold mb-2 block">Blog Title</label>
-              <input type="text" name="title" id="title" class="h-12 w-full bg-gray-100 rounded-xl border-none focus:outline-none py-2 px-3" placeholder="Enter blog title" />
-            </div>
-
-            <!-- Blog Snippet -->
-            <div class="mt-6">
-              <label for="snippet" class="text-[17px] leading-tight font-bold mb-2 block">Blog Snippet</label>
-              <textarea name="snippet" id="snippet" class="h-24 w-full bg-gray-100 rounded-xl border-none focus:outline-none py-2 px-3" placeholder="Enter a brief snippet of the blog"></textarea>
-            </div>
-
-            <!-- Blog Body -->
-            <div class="mt-6">
-              <label for="body" class="text-[17px] leading-tight font-bold mb-2 block">Blog Body</label>
-              <textarea name="body" id="body" class="h-48 w-full bg-gray-100 rounded-xl border-none focus:outline-none py-2 px-3" placeholder="Write your blog here..."></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="mt-6">
-              <button type="submit" class="bg-black text-white hover:bg-opacity-90 font-bold py-3.5 px-5 rounded-xl w-full">
-                Publish Blog
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
+
+        <!-- Category Selection -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Category</label>
+          <select name="type" required class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-xl">
+            <option value="">Select a category</option>
+            <option value="Tech & Gadgets">Tech & Gadgets</option>
+            <option value="Fashion & Beauty">Fashion & Beauty</option>
+            <option value="News">News</option>
+            <option value="Food & Recipes">Food & Recipes</option>
+            <option value="Lifestyle">Lifestyle</option>
+          </select>
+        </div>
+
+        <!-- Title Input -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Title</label>
+          <input 
+            type="text" 
+            name="title" 
+            required
+            class="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Give your story a great title"
+          >
+        </div>
+
+        <!-- Snippet Input -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Short Description</label>
+          <textarea 
+            name="snippet" 
+            required
+            rows="2"
+            class="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Write a brief introduction (max 150 characters)"
+            maxlength="150"
+          ></textarea>
+        </div>
+
+        <!-- Content Input -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">
+            Content
+            <span class="ml-2 text-gray-500" id="wordCount">0 words</span>
+            <span class="text-xs text-gray-500">(300-500 words required)</span>
+          </label>
+          <textarea 
+            name="body" 
+            required
+            rows="12"
+            id="contentInput"
+            class="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Tell your story..."
+          ></textarea>
+          <div class="text-sm text-red-500 hidden" id="wordCountError">
+            Your story must be between 300 and 500 words.
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button 
+            type="submit"
+            id="submitButton"
+            disabled
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            Publish Story
+            <svg class="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const contentInput = document.getElementById('contentInput');
+  const wordCount = document.getElementById('wordCount');
+  const wordCountError = document.getElementById('wordCountError');
+  const submitButton = document.getElementById('submitButton');
+  const imageInput = document.getElementById('imageInput');
+  const imagePreview = document.getElementById('imagePreview');
+  const fileInfo = document.getElementById('fileInfo');
+  const form = document.getElementById('blogForm');
+  const dropZone = document.getElementById('dropZone');
+  const imageError = document.getElementById('imageError');
+
+  // Word count validation
+  function updateWordCount() {
+    const words = contentInput.value.trim().split(/\s+/).filter(word => word.length > 0);
+    const count = words.length;
+    wordCount.textContent = `${count} words`;
+
+    // Validate word count
+    if (count < 300 || count > 500) {
+      wordCountError.classList.remove('hidden');
+      submitButton.disabled = true;
+    } else {
+      wordCountError.classList.add('hidden');
+      submitButton.disabled = false;
+    }
+  }
+
+  contentInput.addEventListener('input', updateWordCount);
+
+  // Add validation styles
+  function updateImageValidation(isValid) {
+    if (!isValid) {
+      dropZone.classList.add('border-red-300', 'bg-red-50');
+      dropZone.classList.remove('border-gray-300', 'border-indigo-500', 'bg-indigo-50');
+      imageError.classList.remove('hidden');
+    } else {
+      dropZone.classList.remove('border-red-300', 'bg-red-50');
+      dropZone.classList.add('border-gray-300');
+      imageError.classList.add('hidden');
+    }
+  }
+
+  // Update image preview handling
+  imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        updateImageValidation(false);
+        imageError.textContent = 'Please select a valid image file';
+        this.value = ''; // Clear the input
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        updateImageValidation(false);
+        imageError.textContent = 'Image size should be less than 5MB';
+        this.value = ''; // Clear the input
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = imagePreview.querySelector('img');
+        img.src = e.target.result;
+        imagePreview.classList.remove('hidden');
+        fileInfo.textContent = `Selected: ${file.name}`;
+        updateImageValidation(true);
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Update form submission
+  form.addEventListener('submit', function(e) {
+    const hasImage = imageInput.files.length > 0;
+    const words = contentInput.value.trim().split(/\s+/).filter(word => word.length > 0);
+    let isValid = true;
+
+    // Validate word count
+    if (words.length < 300 || words.length > 500) {
+      wordCountError.classList.remove('hidden');
+      isValid = false;
+    }
+
+    // Validate image
+    if (!hasImage) {
+      updateImageValidation(false);
+      isValid = false;
+    }
+
+    if (!isValid) {
+      e.preventDefault();
+      // Scroll to the first error
+      const firstError = document.querySelector('.text-red-500:not(.hidden)');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+
+  // Update drag and drop handling
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (!dropZone.classList.contains('border-red-300')) {
+      dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+    }
+  });
+  
+  dropZone.addEventListener('dragleave', () => {
+    if (!dropZone.classList.contains('border-red-300')) {
+      dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+    }
+  });
+  
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        updateImageValidation(false);
+        imageError.textContent = 'Please select a valid image file';
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        updateImageValidation(false);
+        imageError.textContent = 'Image size should be less than 5MB';
+        return;
+      }
+
+      imageInput.files = e.dataTransfer.files;
+      const event = new Event('change');
+      imageInput.dispatchEvent(event);
+    }
+  });
+});
+</script>
 
 <!-- Footer Section -->
 <footer class="bg-black pb-5">

@@ -16,15 +16,26 @@ const cookieParser = require('cookie-parser');
 // Dynamic port handling
 const PORT = process.env.PORT || 5000;
 
-// Database URI - Make sure this is your correct connection string
-const dbURI = process.env.MONGODB_URI;
+// Database configuration
+const username = encodeURIComponent(process.env.MONGODB_USERNAME);
+const password = encodeURIComponent(process.env.MONGODB_PASSWORD);
+const database = process.env.MONGODB_DATABASE;
+
+// Construct the connection string
+const dbURI = `mongodb+srv://${username}:${password}@cluster.y7axs.mongodb.net/${database}?retryWrites=true&w=majority`;
 
 // Updated MongoDB connection configuration
 mongoose.connect(dbURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 10000,
     socketTimeoutMS: 45000,
+    retryWrites: true,
+    w: 'majority',
+    retryReads: true,
+    connectTimeoutMS: 10000,
+    maxPoolSize: 10,
+    family: 4
 })
 .then(() => {
     console.log("Connected Successfully to MongoDB");
@@ -42,14 +53,24 @@ mongoose.connect(dbURI, {
     process.exit(1);
 });
 
+// Add reconnection handling
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected! Attempting to reconnect...');
+    setTimeout(() => {
+        mongoose.connect(dbURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000
+        }).catch(err => {
+            console.error('Reconnection failed:', err);
+        });
+    }, 5000); // Wait 5 seconds before trying to reconnect
+});
+
 // Add connection error handler
 mongoose.connection.on('error', err => {
     console.error('MongoDB connection error:', err);
-});
-
-// Add disconnection handler
-mongoose.connection.on('disconnected', () => {
-    console.log('MongoDB disconnected');
 });
 
 // Handle process termination
@@ -387,20 +408,24 @@ app.get("/dashboard", requireAuth, async (req, res) => {
     // Fetch the count of blog posts authored by the user
     const postCount = await BlogPost.countDocuments({ user: userId });
 
+    // Calculate total views from all user's posts
+    const userPosts = await BlogPost.find({ user: userId });
+    const totalViews = userPosts.reduce((sum, post) => sum + (post.views || 0), 0);
+
     res.render("index-3", {
       title: "Medium: Read and write stories",
       userName: user.name,
       userEmail: user.email,
       userUsername: user.username,
       userGender: user.gender,
-      postCount, // Pass the post count to the view
+      postCount,
+      totalViews // Pass total views to the template
     });
   } catch (err) {
     console.error("Error retrieving user data:", err);
     res.render("error", {
       title: "Error",
-      message:
-        "An error occurred while retrieving your data. Please try again.",
+      message: "An error occurred while retrieving your data. Please try again.",
     });
   }
 });
@@ -408,17 +433,15 @@ app.get("/dashboard", requireAuth, async (req, res) => {
 // Blog Route with Category and Search Filtering
 app.get("/blog", requireAuth, async (req, res) => {
   try {
-    const searchQuery = req.query.search || ""; // Get search query
-    const selectedCategory = req.query.category || ""; // Get selected category
+    const searchQuery = req.query.search || "";
+    const selectedCategory = req.query.category || "";
 
     let filter = {};
 
-    // Add category filtering if a category is selected
     if (selectedCategory) {
       filter.type = selectedCategory;
     }
 
-    // Add search filtering if a search query is present
     if (searchQuery) {
       filter.$or = [
         { title: { $regex: searchQuery, $options: "i" } },
@@ -427,17 +450,49 @@ app.get("/blog", requireAuth, async (req, res) => {
       ];
     }
 
-    // Fetch filtered blog posts based on the search query and category
-    const blogs = await BlogPost.find(filter).lean();
+    // Fetch blogs and sort by createdAt in descending order
+    const blogs = await BlogPost.find(filter)
+      .sort({ createdAt: -1 })
+      .lean();
 
-    // Render the blog list page with the filtered blogs, search query, and category
+    // Group blogs by date
+    const groupedBlogs = blogs.reduce((groups, blog) => {
+      const date = new Date(blog.createdAt);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      let dateString;
+      if (date.toDateString() === today.toDateString()) {
+        dateString = 'Today';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        dateString = 'Yesterday';
+      } else {
+        dateString = date.toLocaleDateString('en-US', { 
+          weekday: 'long',
+          month: 'long', 
+          day: 'numeric'
+        });
+      }
+
+      if (!groups[dateString]) {
+        groups[dateString] = [];
+      }
+      groups[dateString].push(blog);
+      return groups;
+    }, {});
+
     res.render("index", {
       title: "Blog",
       userName: req.session.user ? req.session.user.name : "Guest",
-      blogs: blogs || [], // If no blogs, pass an empty array
-      selectedCategory, // Pass selected category back to view
-      searchQuery, // Pass search query back to view
+      groupedBlogs,
+      selectedCategory,
+      searchQuery,
+      updateMessage: req.session.updateMessage
     });
+
+    // Clear update message after rendering
+    delete req.session.updateMessage;
   } catch (err) {
     console.error("Error fetching blog posts:", err);
     res.render("error", {
@@ -714,14 +769,74 @@ app.put("/blog/:id", upload.single("image"), requireAuth, async (req, res) => {
       throw new Error('Failed to update blog post');
     }
 
-    // Redirect to the updated blog post
-    res.redirect(`/blog/${blogId}`);
+    // Show success message and redirect to main page
+    req.session.updateMessage = "Blog post updated successfully!";
+    res.redirect("/blog"); // Redirect to main page instead of individual post
   } catch (err) {
     console.error('Error updating blog post:', err);
     res.render("error", {
       title: "Error",
       message: "An error occurred while updating the blog post."
     });
+  }
+});
+
+// Route to handle post likes
+app.post('/blog/:id/like', requireAuth, async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const userId = req.session.userId;
+
+    const blog = await BlogPost.findById(blogId);
+    if (!blog) {
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+
+    // Initialize likes array if it doesn't exist
+    if (!blog.likes) {
+      blog.likes = [];
+    }
+
+    // Check if user already liked the post
+    const userLikeIndex = blog.likes.indexOf(userId);
+    if (userLikeIndex === -1) {
+      // User hasn't liked the post, add like
+      blog.likes.push(userId);
+    } else {
+      // User already liked the post, remove like
+      blog.likes.splice(userLikeIndex, 1);
+    }
+
+    await blog.save();
+    res.json({ likes: blog.likes.length, isLiked: userLikeIndex === -1 });
+  } catch (err) {
+    console.error('Error handling like:', err);
+    res.status(500).json({ error: 'Failed to update like' });
+  }
+});
+
+// Route to increment view count
+app.post('/blog/:id/view', async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const blog = await BlogPost.findById(blogId);
+    
+    if (!blog) {
+      return res.status(404).json({ error: 'Blog post not found' });
+    }
+
+    // Initialize views if it doesn't exist
+    if (!blog.views) {
+      blog.views = 0;
+    }
+
+    blog.views += 1;
+    await blog.save();
+    
+    res.json({ views: blog.views });
+  } catch (err) {
+    console.error('Error updating view count:', err);
+    res.status(500).json({ error: 'Failed to update view count' });
   }
 });
 
