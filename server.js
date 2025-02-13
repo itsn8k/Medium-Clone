@@ -4,6 +4,7 @@ const express = require("express");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const MongoStore = require('connect-mongo');
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const multer = require("multer");
@@ -12,6 +13,7 @@ const BlogPost = require("./models/blog"); // Ensure this model is correctly def
 const app = express();
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 
 // Dynamic port handling
 const PORT = process.env.PORT || 5000;
@@ -96,14 +98,31 @@ app.use(
     secret: process.env.SESSION_SECRET || "secret-key",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: dbURI,
+      ttl: 14 * 24 * 60 * 60, // = 14 days. Default
+      autoRemove: 'native', // Default
+      crypto: {
+        secret: process.env.SESSION_SECRET || "secret-key",
+      },
+      touchAfter: 24 * 3600 // time period in seconds
+    }),
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
       sameSite: 'lax'
     }
   })
 );
+
+// Add error handling for the session store
+app.use((req, res, next) => {
+  if (!req.session) {
+    return next(new Error('Session store unavailable'));
+  }
+  next();
+});
 
 // Use method-override middleware
 app.use(methodOverride("_method"));
@@ -204,6 +223,133 @@ app.use((req, res, next) => {
   next();
 });
 
+// Authentication Routes - Place these after your middleware configurations but before other routes
+
+// GET Routes for Authentication
+app.get("/", (req, res) => {
+  if (req.session.userId) {
+    res.redirect("/dashboard");
+  } else {
+    res.render("signin", { 
+      title: "Medium: Read and write stories",
+      error: req.query.error 
+    });
+  }
+});
+
+app.get("/signin", (req, res) => {
+  if (req.session.userId) {
+    res.redirect("/dashboard");
+  } else {
+    res.render("signin", { title: "Sign In" });
+  }
+});
+
+app.get("/signup", (req, res) => {
+  if (req.session.userId) {
+    res.redirect("/dashboard");
+  } else {
+    res.render("signup", { title: "Sign Up" });
+  }
+});
+
+// POST Routes for Authentication
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user
+    const user = await details.findOne({ email });
+    
+    if (!user) {
+      return res.render("signin", {
+        error: "Invalid email or password",
+        values: { email }
+      });
+    }
+
+    // Compare password
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      return res.render("signin", {
+        error: "Invalid email or password",
+        values: { email }
+      });
+    }
+
+    // Set session
+    req.session.userId = user._id;
+    req.session.user = user;
+
+    // Handle remember me
+    if (req.body.remember_me) {
+      const token = crypto.randomBytes(32).toString('hex');
+      user.rememberToken = token;
+      await user.save();
+      res.cookie('remember_token', token, { 
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
+      });
+    }
+
+    res.redirect("/dashboard");
+
+  } catch (err) {
+    console.error("Login error:", err);
+    res.render("signin", {
+      error: "Login failed. Please try again.",
+      values: { email: req.body.email }
+    });
+  }
+});
+
+app.post("/register", async (req, res) => {
+  try {
+    const { username, name, email, password, gender } = req.body;
+
+    // Check existing user
+    const existingUser = await details.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      return res.render("signup", {
+        error: "Email or username already exists",
+        values: { username, name, email, gender }
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const user = new details({
+      username,
+      name,
+      email,
+      password: hashedPassword,
+      gender
+    });
+
+    await user.save();
+
+    // Set session
+    req.session.userId = user._id;
+    req.session.user = user;
+    res.redirect("/dashboard");
+
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.render("signup", {
+      error: "Registration failed. Please try again.",
+      values: req.body
+    });
+  }
+});
+
 // Routes
 app.get("/", async (req, res) => {
   try {
@@ -271,125 +417,6 @@ app.get("/post", requireAuth, async (req, res) => {
 });
 app.get("/home", (req, res) => {
   res.render("index", { title: "Medium: Read and write stories" });
-});
-
-// Sign-up Route
-app.post("/signup", async (req, res) => {
-  const { name, username, email, password, gender } = req.body;
-
-  try {
-    if (!email || !password) {
-      return res.render("existing", {
-        title: "Signup Error",
-        message: "Email and password are required.",
-      });
-    }
-
-    const existingUser = await details.findOne({ email });
-    if (existingUser) {
-      return res.render("existing", {
-        title: "Signup Error",
-        message: "Email already exists.",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new details({
-      name,
-      username,
-      email,
-      password: hashedPassword,
-      gender,
-    });
-
-    await newUser.save();
-
-    res.render("success", {
-      title: "Signup Success",
-      message: "User registered successfully.",
-    });
-  } catch (err) {
-    console.error("Signup error:", err);
-    res.render("error", {
-      title: "Error",
-      message: "An error occurred during sign-up. Please try again.",
-    });
-  }
-});
-
-// Sign-in Route
-app.post("/signin", async (req, res) => {
-  const { email, password, remember_me } = req.body;
-
-  try {
-    const user = await details.findOne({ email });
-    if (!user) {
-      return res.render("invalid", {
-        title: "Sign-In Error",
-        message: "Invalid email or password.",
-      });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.render("invalid", {
-        title: "Sign-In Error",
-        message: "Invalid email or password.",
-      });
-    }
-
-    // Set up the session
-    req.session.userId = user._id;
-    req.session.user = user;
-
-    // If remember me is checked, set a persistent cookie
-    if (remember_me) {
-      // Create a secure token
-      const rememberToken = await bcrypt.hash(user._id.toString(), 10);
-      
-      // Save the token to the user in the database
-      await details.findByIdAndUpdate(user._id, {
-        rememberToken: rememberToken
-      });
-
-      // Set a cookie that expires in 30 days
-      res.cookie('remember_token', rememberToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
-      });
-    }
-
-    res.redirect("/blog");
-  } catch (err) {
-    console.error("Sign-in error:", err);
-    res.render("error", {
-      title: "Error",
-      message: "An error occurred during sign-in. Please try again.",
-    });
-  }
-});
-
-// Add a new middleware to check for remember_token cookie
-app.use(async (req, res, next) => {
-  if (!req.session.userId && req.cookies.remember_token) {
-    try {
-      // Find user with matching remember token
-      const user = await details.findOne({
-        rememberToken: req.cookies.remember_token
-      });
-
-      if (user) {
-        // Set up the session
-        req.session.userId = user._id;
-        req.session.user = user;
-      }
-    } catch (err) {
-      console.error('Auto-login error:', err);
-    }
-  }
-  next();
 });
 
 // Dashboard Route

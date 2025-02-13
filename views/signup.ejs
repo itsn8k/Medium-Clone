@@ -27,36 +27,50 @@
         </div>
 
         <!-- Registration Form -->
-        <form action="/signup" method="post" class="mt-8 space-y-6">
+        <form action="/register" method="POST" class="mt-8 space-y-6">
           <div class="rounded-md shadow-sm space-y-4">
             <div>
               <label for="name" class="sr-only">Name</label>
-              <input id="name" name="name" type="text" required
-                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
-                placeholder="Name">
+              <input id="name" 
+                     name="name" 
+                     type="text" 
+                     required
+                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                     placeholder="Name">
             </div>
             <div>
               <label for="username" class="sr-only">Username</label>
-              <input id="username" name="username" type="text" required
-                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
-                placeholder="Username">
+              <input id="username" 
+                     name="username" 
+                     type="text" 
+                     required
+                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                     placeholder="Username">
             </div>
             <div>
               <label for="email" class="sr-only">Email address</label>
-              <input id="email" name="email" type="email" required
-                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
-                placeholder="Email address">
+              <input id="email" 
+                     name="email" 
+                     type="email" 
+                     required
+                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                     placeholder="Email address">
             </div>
             <div>
               <label for="password" class="sr-only">Password</label>
-              <input id="password" name="password" type="password" required
-                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
-                placeholder="Password">
+              <input id="password" 
+                     name="password" 
+                     type="password" 
+                     required
+                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                     placeholder="Password">
             </div>
             <div>
               <label for="gender" class="sr-only">Gender</label>
-              <select id="gender" name="gender" required
-                class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm">
+              <select id="gender" 
+                      name="gender" 
+                      required
+                      class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm">
                 <option value="" disabled selected>Select your gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -65,12 +79,10 @@
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <div>
-            <button type="submit" class="group relative w-full flex justify-center py-4 px-6 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
-              Sign Up
-            </button>
-          </div>
+          <button type="submit" 
+                  class="group relative w-full flex justify-center py-4 px-6 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+            Sign Up
+          </button>
         </form>
 
         <!-- Sign In Link -->
@@ -87,7 +99,7 @@
   <div class="text-center">
     <blockquote>
       <p class="text-4xl font-semibold text-white italic leading-relaxed drop-shadow-lg">
-        “Your Stories Await.”
+        "Your Stories Await."
       </p>
     </blockquote>
   </div>
