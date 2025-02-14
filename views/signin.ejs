@@ -29,36 +29,70 @@
     </div>
     
     <!-- Right Side: Login Form -->
-    <div class="w-full md:w-1/2 flex items-center justify-center bg-gray-50">
-      <div class="max-w-md w-full space-y-8 p-8">
+    <div class="w-full md:w-1/2 flex items-center justify-center bg-gray-50 min-h-screen">
+      <div class="w-full max-w-md space-y-8 px-4 sm:px-8 py-12">
         
         <!-- Medium Logo -->
-        <div class="flex justify-center">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" alt="Medium Logo" class="mx-auto h-12 w-12">
+        <div class="flex flex-col items-center space-y-4">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" 
+               alt="Medium Logo" 
+               class="h-12 w-12">
+          <h2 class="text-3xl font-extrabold text-gray-900 text-center">Welcome Back</h2>
+          <p class="text-center text-sm text-gray-600 max-w-sm">
+            Join Medium to read, write, and interact with the stories that matter most to you.
+          </p>
         </div>
         
-        <!-- Add this after the Medium Logo and before the form -->
+        <!-- Error Alert -->
         <% if (locals.error) { %>
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline"><%= error %></span>
+          <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md" role="alert">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-red-600"><%= error %></p>
+              </div>
+            </div>
           </div>
         <% } %>
-        
-        <div>
-          <h2 class="text-3xl font-extrabold text-gray-900 text-center">Sign In to Your Account</h2>
-          <p class="mt-2 text-center text-sm text-gray-600">Access exclusive content and manage your profile.</p>
+
+        <!-- Guest Access Button -->
+        <div class="space-y-5">
+          <a href="/blog?guest=true" 
+             class="group relative w-full flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200">
+            <span class="absolute left-4">
+              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </span>
+            Continue as Guest
+          </a>
+
+          <!-- Divider -->
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-4 bg-gray-50 text-gray-500">or sign in with email</span>
+            </div>
+          </div>
         </div>
 
-        <!-- Login Form -->
+        <!-- Sign In Form -->
         <form action="/login" method="POST" class="mt-8 space-y-6">
-          <div class="rounded-md shadow-sm space-y-4">
+          <div class="space-y-4">
             <div>
               <label for="email" class="sr-only">Email address</label>
               <input id="email" 
                      name="email" 
                      type="email" 
                      required
-                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                     class="appearance-none rounded-full w-full px-5 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                      placeholder="Email address">
             </div>
             <div>
@@ -67,7 +101,7 @@
                      name="password" 
                      type="password" 
                      required
-                     class="appearance-none rounded-md block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
+                     class="appearance-none rounded-full w-full px-5 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                      placeholder="Password">
             </div>
           </div>
@@ -85,22 +119,95 @@
           </div>
 
           <button type="submit" 
-                  class="group relative w-full flex justify-center py-4 px-6 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                  class="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200">
             Sign In
           </button>
         </form>
 
-        <!-- Register Link -->
-        <p class="mt-4 text-center text-sm text-gray-600">
-          Don't have an account? 
-          <a href="/signup" class="font-medium text-black hover:text-gray-700">Sign Up</a>
-        </p>
+        <!-- Bottom Links -->
+        <div class="space-y-4 mt-8">
+          <!-- Register Link -->
+          <p class="text-center text-sm">
+            Don't have an account? 
+            <a href="/signup" class="font-medium text-black hover:text-gray-700 transition-colors duration-200">
+              Sign Up
+            </a>
+          </p>
+
+          <!-- Guest Info Message -->
+          <div class="text-center">
+            <span class="inline-flex items-center px-4 py-2 rounded-full text-xs text-gray-600 bg-gray-100">
+              <svg class="h-4 w-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Guest users can only read posts
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  
-   
-    
+  <!-- Add responsive styles -->
+  <style>
+    @media (max-width: 768px) {
+      .min-h-screen {
+        min-height: 100vh;
+      }
+      
+      .w-full.md\:w-1\/2 {
+        width: 100%;
+      }
+      
+      .max-w-md {
+        max-width: 100%;
+        padding: 1rem;
+      }
+      
+      .py-12 {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+      
+      .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1.5rem;
+      }
+      
+      .rounded-full {
+        border-radius: 9999px;
+      }
+      
+      .px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      
+      .py-3 {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+    }
+
+    /* Improve touch targets on mobile */
+    @media (max-width: 640px) {
+      button, 
+      input[type="submit"],
+      .guest-button {
+        min-height: 44px;
+      }
+      
+      input[type="email"],
+      input[type="password"] {
+        font-size: 16px; /* Prevent zoom on iOS */
+      }
+    }
+
+    /* Smooth transitions */
+    .transition-all {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
+  </style>
 </body>
 </html>

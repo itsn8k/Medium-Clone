@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Medium - Where good ideas find you</title>
+    <link rel="stylesheet" href="/output.css">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/2504/2504925.png">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-white">
+    <!-- Hero Section -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Navigation -->
+        <nav class="border-b border-black/10 h-20">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+                <div class="flex-shrink-0">
+                    <img src="https://miro.medium.com/v2/resize:fit:8978/1*s986xIGqhfsN8U--09_AdA.png" 
+                         alt="Medium" 
+                         class="h-8">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/signin" class="text-sm text-gray-700 hover:text-black">Sign in</a>
+                    <a href="/signup" 
+                       class="px-4 py-2 text-sm bg-black text-white rounded-full hover:bg-gray-800 transition-colors">
+                        Get started
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow">
+            <!-- Hero Content -->
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <h1 class="text-7xl md:text-8xl font-serif font-medium leading-tight text-black">
+                            Stay curious.
+                        </h1>
+                        <p class="text-xl md:text-2xl text-gray-600 max-w-md">
+                            Discover stories, thinking, and expertise from writers on any topic.
+                        </p>
+                        <div class="pt-4">
+                            <a href="/signup" 
+                               class="inline-block px-8 py-3 text-lg bg-black text-white rounded-full hover:bg-gray-800 transition-colors hover:shadow-lg transform hover:-translate-y-0.5">
+                                Start reading
+                            </a>
+                        </div>
+                    </div>
+                    <div class="md:block">
+                        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop" 
+                             alt="Decorative" 
+                             class="w-full h-[300px] md:h-[400px] object-cover rounded-2xl shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trending Section -->
+            <div class="bg-white py-16 border-t border-gray-100">
+                <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center space-x-2 mb-8">
+                        <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        <h2 class="text-lg font-medium text-black">Trending on Medium</h2>
+                    </div>
+
+                    <!-- Updated Trending Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <% trendingPosts.forEach(post => { %>
+                            <a href="/blog/<%= post.postId %>" class="group cursor-pointer">
+                                <div class="flex space-x-4">
+                                    <span class="text-3xl font-bold text-gray-200"><%= post.number %></span>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center space-x-2">
+                                            <img src="<%= post.authorImage || 'https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png' %>" 
+                                                 alt="<%= post.author %>" 
+                                                 class="w-6 h-6 rounded-full object-cover bg-white border border-gray-100">
+                                            <span class="text-sm font-medium text-gray-900"><%= post.author %></span>
+                                        </div>
+                                        <h3 class="font-bold text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-2">
+                                            <%= post.title %>
+                                        </h3>
+                                        <div class="flex items-center text-sm text-gray-500 space-x-2">
+                                            <span><%= post.readTime %></span>
+                                            <span>·</span>
+                                            <div class="flex items-center space-x-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                                <span><%= post.views %></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Section -->
+            <div class="py-16 bg-gray-50">
+                <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-xl font-medium mb-8 text-black">Discover more of what matters to you</h2>
+                    <div class="flex flex-wrap gap-3">
+                        <% ['Programming', 'Data Science', 'Technology', 'Writing', 'Productivity', 'Machine Learning'].forEach(category => { %>
+                            <a href="#" 
+                               class="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+                                <%= category %>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-50 border-t border-gray-200">
+            <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="font-medium mb-4">About</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li><a href="#" class="hover:text-black">About Medium</a></li>
+                            <li><a href="#" class="hover:text-black">Terms of Service</a></li>
+                            <li><a href="#" class="hover:text-black">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium mb-4">Write</h3>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li><a href="#" class="hover:text-black">Write on Medium</a></li>
+                            <li><a href="#" class="hover:text-black">Writing Guide</a></li>
+                        </ul>
+                    </div>
+                    <!-- Add more footer columns as needed -->
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <style>
+        /* Custom Styles */
+        @import url('https://fonts.googleapis.com/css2?family=Gt+Sectra+Display:wght@400;500;700&display=swap');
+
+        .font-serif {
+            font-family: 'GT Sectra Display', serif;
+        }
+
+        /* Smooth transitions */
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+
+        /* Better button hover effects */
+        .hover\:shadow-lg:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Improved mobile responsiveness */
+        @media (max-width: 768px) {
+            .text-7xl {
+                font-size: 4rem;
+            }
+            
+            .py-20 {
+                padding-top: 3rem;
+                padding-bottom: 3rem;
+            }
+        }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Enhanced transitions */
+        .transform {
+            transition-property: transform;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        /* Improved hover effects */
+        .hover\:-translate-y-0.5:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Better text handling */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Smooth image loading */
+        img {
+            transition: opacity 0.3s ease;
+        }
+
+        img.loading {
+            opacity: 0;
+        }
+
+        img.loaded {
+            opacity: 1;
+        }
+    </style>
+</body>
+</html> 

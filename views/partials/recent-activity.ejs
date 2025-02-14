@@ -1,0 +1,19 @@
+<h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
+<div class="space-y-6">
+    <% if (posts && posts.length > 0) { %>
+        <% posts.forEach(post => { %>
+            <div class="flex items-center justify-between py-4">
+                <div>
+                    <h3 class="font-medium text-gray-900"><%= post.title %></h3>
+                    <p class="text-sm text-gray-500">
+                        <%= new Date(post.createdAt).toLocaleDateString() %> • 
+                        <%= post.views %> views • 
+                        <%= post.likes.length %> likes
+                    </p>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p class="text-gray-500 text-center py-8">No posts yet</p>
+    <% } %>
+</div> 

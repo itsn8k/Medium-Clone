@@ -41,6 +41,10 @@ const detailsSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now
+    },
+    image: {
+      type: String,
+      default: "https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png" // Default Medium logo
     }
   },
   { timestamps: true }

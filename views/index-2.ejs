@@ -80,7 +80,10 @@
                          alt="Author" 
                          class="h-12 w-12 rounded-full border-2 border-white shadow-sm">
                     <div class="text-left">
-                        <p class="text-base font-semibold text-gray-900"><%= blogPost.author %></p>
+                        <a href="/user/<%= blogPost.author %>" 
+                           class="text-base font-semibold text-gray-900 hover:underline">
+                            <%= blogPost.author %>
+                        </a>
                         <div class="flex items-center text-sm text-gray-500">
                             <time datetime="<%= blogPost.createdAt %>">
                                 <%= new Date(blogPost.createdAt).toLocaleDateString('en-US', {
@@ -230,6 +233,119 @@
             white-space: nowrap;
             margin-bottom: 0.5rem;
         }
+
+        /* Link styles */
+        .prose a {
+            color: #111827;
+            text-decoration: none;
+            border-bottom: 1.5px solid #9CA3AF;
+            padding-bottom: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .prose a:hover {
+            color: #000000;
+            border-bottom-color: #000000;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* External link styles (for http/https links) */
+        .prose a[href^="http"] {
+            color: #111827;
+            text-decoration: none;
+            border-bottom: 1.5px solid #9CA3AF;
+            padding: 0 2px;
+            margin: 0 1px;
+            border-radius: 2px;
+            word-break: break-word;
+        }
+
+        .prose a[href^="http"]:hover {
+            color: #000000;
+            background-color: rgba(0, 0, 0, 0.05);
+            border-bottom-color: #000000;
+        }
+
+        .prose a[href^="http"]::after {
+            content: "↗";
+            display: inline-block;
+            margin-left: 2px;
+            font-size: 0.875em;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+
+        .prose a[href^="http"]:hover::after {
+            transform: translate(1px, -1px);
+            opacity: 1;
+        }
+
+        /* Add focus styles for accessibility */
+        .prose a:focus {
+            outline: 2px solid #000000;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        /* Better typography */
+        .prose {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .prose h2 {
+            font-size: 1.5em;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            font-weight: 600;
+        }
+
+        .prose h3 {
+            font-size: 1.25em;
+            margin-top: 1.6em;
+            margin-bottom: 0.8em;
+            font-weight: 600;
+        }
+
+        /* Code blocks */
+        .prose pre {
+            background-color: #f3f4f6;
+            padding: 1em;
+            border-radius: 0.5em;
+            overflow-x: auto;
+        }
+
+        .prose code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875em;
+            background-color: #f3f4f6;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25em;
+        }
+
+        /* Add these styles for auto-detected links */
+        .prose a[href^="http"] {
+            color: #2563eb;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            word-break: break-word;
+        }
+
+        .prose a[href^="http"]:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .prose a[href^="http"]::after {
+            content: "↗";
+            display: inline-block;
+            margin-left: 2px;
+            font-size: 0.875em;
+            transition: transform 0.2s ease;
+        }
+
+        .prose a[href^="http"]:hover::after {
+            transform: translate(1px, -1px);
+        }
     </style>
 
     <!-- Add this script before closing body tag -->
@@ -276,6 +392,75 @@
                 }, 2000);
             });
         });
+
+        // Function to convert URLs to clickable links
+        function linkifyText() {
+            const articleContent = document.querySelector('.prose');
+            if (!articleContent) return;
+
+            // Regular expression to match URLs
+            const urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g;
+
+            // Get all text nodes in the article
+            const walk = document.createTreeWalker(
+                articleContent,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const textNodes = [];
+            let node;
+            while (node = walk.nextNode()) {
+                if (node.parentElement.tagName !== 'A' && // Skip if parent is already a link
+                    !node.parentElement.closest('pre') && // Skip code blocks
+                    !node.parentElement.closest('code')) { // Skip inline code
+                    textNodes.push(node);
+                }
+            }
+
+            // Process each text node
+            textNodes.forEach(textNode => {
+                const text = textNode.nodeValue;
+                if (urlRegex.test(text)) {
+                    const fragment = document.createDocumentFragment();
+                    let lastIdx = 0;
+                    let match;
+
+                    // Reset regex
+                    urlRegex.lastIndex = 0;
+
+                    while ((match = urlRegex.exec(text)) !== null) {
+                        // Add text before the link
+                        if (match.index > lastIdx) {
+                            fragment.appendChild(document.createTextNode(text.substring(lastIdx, match.index)));
+                        }
+
+                        // Create the link
+                        const link = document.createElement('a');
+                        link.href = match[0];
+                        link.textContent = match[0];
+                        link.target = "_blank"; // Open in new tab
+                        link.rel = "noopener noreferrer"; // Security best practice
+                        link.className = "text-blue-600 hover:text-blue-800 hover:underline";
+                        fragment.appendChild(link);
+
+                        lastIdx = match.index + match[0].length;
+                    }
+
+                    // Add remaining text
+                    if (lastIdx < text.length) {
+                        fragment.appendChild(document.createTextNode(text.substring(lastIdx)));
+                    }
+
+                    // Replace the original text node with the fragment
+                    textNode.parentNode.replaceChild(fragment, textNode);
+                }
+            });
+        }
+
+        // Run the linkify function after page loads
+        linkifyText();
     });
     </script>
 </body>
