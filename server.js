@@ -514,9 +514,13 @@ app.get("/view", (req, res) => {
   res.render("index-2", { title: "Medium: Read and write stories" });
 });
 
-app.get("/post", checkFullAuth, async (req, res) => {
-  res.render("index-5", { title: "Medium: Read and write stories" });
+app.get("/post", isAuthenticated, (req, res) => {
+  res.render("index-5", {
+    title: "Create New Story - Medium",
+    user: req.session.user
+  });
 });
+
 app.get("/home", (req, res) => {
   res.render("index", { title: "Medium: Read and write stories" });
 });
@@ -829,31 +833,26 @@ app.post("/logout", (req, res) => {
 });
 
 // GET route to display the edit form
-app.get("/blog/:id/edit", async (req, res) => {
+app.get("/blog/:id/edit", isAuthenticated, async (req, res) => {
   try {
-    const blogPost = await BlogPost.findById(req.params.id).lean();
-
+    const blogPost = await BlogPost.findById(req.params.id);
     if (!blogPost) {
-      return res
-        .status(404)
-        .render("error", { message: "Blog post not found." });
+      return res.status(404).redirect('/blog');
+    }
+    
+    // Check if user is the author
+    if (blogPost.author !== req.session.user.username) {
+      return res.status(403).redirect('/blog');
     }
 
-    // Ensure only the author can edit the post
-    if (blogPost.user.toString() !== req.session.userId.toString()) {
-      return res.status(403).render("error", {
-        message: "You do not have permission to edit this post.",
-      });
-    }
-
-    // Render the edit form
     res.render("index-4", {
-      title: "Edit Blog Post",
+      title: "Edit Story | Medium",
       blogPost,
+      user: req.session.user
     });
   } catch (err) {
-    console.error("Error fetching blog post:", err);
-    res.render("error", { message: "An error occurred. Please try again." });
+    console.error("Error loading edit page:", err);
+    res.redirect('/blog');
   }
 });
 
@@ -1125,5 +1124,66 @@ function isAuthenticated(req, res, next) {
     res.redirect("/signin");
   }
 }
+
+// Add this route for handling blog post creation with image
+app.post("/create-post", upload.single('image'), async (req, res) => {
+  try {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const { title, content, description } = req.body;
+    let imageUrl = null;
+
+    // Handle image upload if present
+    if (req.file) {
+      imageUrl = `/uploads/blogs/${req.file.filename}`;
+    }
+
+    // Create new blog post
+    const newPost = new BlogPost({
+      title,
+      content,
+      description,
+      image: imageUrl,
+      author: req.session.user.username,
+      user: req.session.userId,
+      createdAt: new Date(),
+      views: 0,
+      likes: [],
+      comments: []
+    });
+
+    await newPost.save();
+
+    res.json({
+      success: true,
+      post: newPost,
+      message: 'Post created successfully'
+    });
+  } catch (err) {
+    console.error('Error creating post:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create post'
+    });
+  }
+});
+
+// Add route for getting blog post creation page
+app.get("/post", isAuthenticated, (req, res) => {
+  res.render("index-5", {
+    title: "Create New Story - Medium",
+    user: req.session.user
+  });
+});
+
+// Add route for blog post preview
+app.get("/preview", isAuthenticated, (req, res) => {
+  res.render("index-5", {
+    title: "Preview Story - Medium",
+    user: req.session.user
+  });
+});
 
 module.exports = details;
