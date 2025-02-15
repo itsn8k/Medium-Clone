@@ -64,10 +64,31 @@ function initializeApp() {
       cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
+        sameSite: "lax",
         maxAge: 24 * 60 * 60 * 1000,
       },
     })
   );
+
+  // Add security headers
+  app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    next();
+  });
+
+  // Force HTTPS in production
+  if (process.env.NODE_ENV === "production") {
+    app.use((req, res, next) => {
+      if (req.header("x-forwarded-proto") !== "https") {
+        res.redirect(`https://${req.header("host")}${req.url}`);
+      } else {
+        next();
+      }
+    });
+  }
 
   // Set up view engine and static files
   app.set("view engine", "ejs");
