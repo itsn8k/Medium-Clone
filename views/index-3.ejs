@@ -1,403 +1,537 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Medium</title>
-    <link rel="stylesheet" href="/output.css">
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/2504/2504925.png">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50">
+    <link rel="stylesheet" href="/output.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://cdn-icons-png.flaticon.com/128/2504/2504925.png"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50">
     <div class="min-h-screen flex flex-col">
-        <!-- Navigation -->
-        <nav class="bg-white border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <div class="flex-shrink-0 flex items-center">
-                            <img class="h-8 w-auto" src="https://miro.medium.com/v2/resize:fit:8978/1*s986xIGqhfsN8U--09_AdA.png" alt="Medium">
-                        </div>
-                    </div>
-                </div>
+      <!-- Navigation -->
+      <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex">
+              <div class="flex-shrink-0 flex items-center">
+                <img
+                  class="h-8 w-auto"
+                  src="https://miro.medium.com/v2/resize:fit:8978/1*s986xIGqhfsN8U--09_AdA.png"
+                  alt="Medium"
+                />
+              </div>
             </div>
-        </nav>
+          </div>
+        </div>
+      </nav>
 
-        <!-- Main Content -->
-        <main class="flex-grow py-6">
-            <div class="container px-4 mx-auto">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <!-- Left Sidebar -->
-                    <div class="w-full md:w-1/4">
-                        <!-- Profile Card -->
-                        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
-                            <div class="flex items-center space-x-4 mb-6">
-                                <div class="relative group">
-                                    <img src="<%= user.image || 'https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png' %>" 
-                                         alt="Profile" 
-                                         class="w-16 h-16 rounded-full object-cover border-2 border-gray-200 group-hover:border-gray-300 transition-all">
-                                    
-                                    <!-- Image upload overlay -->
-                                    <label class="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        <input type="file" id="profileImage" accept="image/*" class="hidden" onchange="updateProfileImage(this)">
-                                    </label>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-gray-900"><%= user.name %></h2>
-                                    <p class="text-sm text-gray-500">@<%= user.username %></p>
-                                </div>
-                            </div>
-                        </div>
+      <!-- Main Content -->
+      <main class="flex-grow py-6">
+        <div class="container px-4 mx-auto">
+          <div class="flex flex-col md:flex-row gap-8">
+            <!-- Left Sidebar -->
+            <div class="w-full md:w-1/4">
+              <!-- Profile Card -->
+              <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+                <div class="flex items-center space-x-4 mb-6">
+                  <!-- Profile Image Section -->
+                  <div class="relative group">
+                    <img
+                      src="<%= user.image || 'https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png' %>"
+                      alt="Profile"
+                      class="w-16 h-16 rounded-full object-cover border-2 border-gray-200 group-hover:border-gray-300 transition-all"
+                    />
 
-                        <!-- Navigation Menu -->
-                        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                            <nav class="flex flex-col">
-                                <!-- Navigation items -->
-                                <a href="/dashboard" class="flex items-center px-6 py-4 text-gray-900 bg-gray-50 border-l-4 border-black">
-                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                                    </svg>
-                                    Dashboard
-                                </a>
-                                <!-- Add other navigation items -->
-                                <a href="/blog" class="flex items-center px-6 py-4 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14"/>
-                                    </svg>
-                                    Your Stories
-                                </a>
-                                <a href="/post" class="flex items-center px-6 py-4 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                    Write
-                                </a>
-                                <a href="#" class="flex items-center px-6 py-4 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    Settings
-                                </a>
-                                <a href="#" onclick="showLogoutModal(event)" class="flex items-center px-6 py-4 text-red-600 hover:bg-red-50 transition-colors">
-                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                    </svg>
-                                    Sign out
-                                </a>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <!-- Main Content Area -->
-                    <div class="w-full md:w-3/4">
-                        <!-- Stats Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-                            <!-- Published Posts -->
-                            <div class="bg-white rounded-2xl shadow-sm p-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="text-gray-500 text-sm font-medium">Published Posts</h3>
-                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
-                                </div>
-                                <div class="text-2xl font-bold text-gray-900"><%= stats?.totalPosts || 0 %></div>
-                                <p class="text-sm text-gray-500 mt-2">Total stories published</p>
-                            </div>
-
-                            <!-- Views Stats -->
-                            <div class="bg-white rounded-2xl shadow-sm p-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="text-gray-500 text-sm font-medium">Total Views</h3>
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </div>
-                                <div class="text-2xl font-bold text-gray-900"><%= stats?.totalViews || 0 %></div>
-                                <div class="flex items-center text-sm text-gray-500 mt-2">
-                                    <span>Total story views</span>
-                                    <% if (stats?.totalPosts > 0) { %>
-                                        <span class="mx-1">·</span>
-                                        <span class="text-gray-900 font-medium">
-                                            <%= Math.round((stats?.totalViews || 0) / stats.totalPosts) %> avg
-                                        </span>
-                                    <% } %>
-                                </div>
-                            </div>
-
-                            <!-- Likes Stats -->
-                            <div class="bg-white rounded-2xl shadow-sm p-6">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="text-gray-500 text-sm font-medium">Total Likes</h3>
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                    </svg>
-                                </div>
-                                <div class="text-2xl font-bold text-gray-900"><%= stats?.totalLikes || 0 %></div>
-                                <div class="flex items-center text-sm text-gray-500 mt-2">
-                                    <span>Total story likes</span>
-                                    <% if (stats?.totalPosts > 0) { %>
-                                        <span class="mx-1">·</span>
-                                        <span class="text-gray-900 font-medium">
-                                            <%= Math.round((stats?.totalLikes || 0) / stats.totalPosts) %> avg
-                                        </span>
-                                    <% } %>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recent Activity -->
-                        <div class="bg-white rounded-2xl shadow-sm p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
-                            <div class="space-y-6">
-                                <% if (posts && posts.length > 0) { %>
-                                    <% posts.forEach(post => { %>
-                                        <div class="flex items-center justify-between py-4 border-b border-gray-100 last:border-0">
-                                            <div class="flex-grow">
-                                                <h3 class="font-medium text-gray-900 hover:text-black">
-                                                    <a href="/blog/<%= post._id %>"><%= post.title %></a>
-                                                </h3>
-                                                <div class="flex items-center text-sm text-gray-500 mt-1 space-x-4">
-                                                    <span><%= post.formattedDate %></span>
-                                                    <div class="flex items-center space-x-1">
-                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                        </svg>
-                                                        <span><%= post.viewCount %> views</span>
-                                                    </div>
-                                                    <div class="flex items-center space-x-1">
-                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                                        </svg>
-                                                        <span><%= post.likeCount %> likes</span>
-                                                    </div>
-                                                    <div class="flex items-center space-x-1">
-                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                                                        </svg>
-                                                        <span><%= post.commentCount %> comments</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <a href="/blog/<%= post._id %>/edit" 
-                                               class="ml-4 text-gray-400 hover:text-gray-500">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    <% }); %>
-                                <% } else { %>
-                                    <div class="text-center py-8">
-                                        <p class="text-gray-500">No posts yet</p>
-                                        <a href="/post" class="mt-2 inline-flex items-center text-sm font-medium text-black hover:text-gray-900">
-                                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                      d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                            Write your first story
-                                        </a>
-                                    </div>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Image upload overlay -->
+                    <label
+                      class="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                    >
+                      <svg
+                        class="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      <input
+                        type="file"
+                        id="profileImage"
+                        name="image"
+                        accept="image/*"
+                        class="hidden"
+                        onchange="updateProfileImage(this)"
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <h2 class="text-xl font-bold text-gray-900">
+                      <%= user.name %>
+                    </h2>
+                    <p class="text-sm text-gray-500">@<%= user.username %></p>
+                  </div>
                 </div>
-            </div>
-        </main>
+              </div>
 
-        <!-- Footer -->
-        <footer class="bg-black pb-5">
-            <!-- Footer content -->
-        </footer>
+              <!-- Navigation Menu -->
+              <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <nav class="flex flex-col">
+                  <!-- Navigation items -->
+                  <a
+                    href="/dashboard"
+                    class="flex items-center px-6 py-4 text-gray-900 bg-gray-50 border-l-4 border-black"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                      />
+                    </svg>
+                    Dashboard
+                  </a>
+                  <!-- Add other navigation items -->
+                  <a
+                    href="/blog"
+                    class="flex items-center px-6 py-4 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H14"
+                      />
+                    </svg>
+                    Your Stories
+                  </a>
+                  <a
+                    href="/post"
+                    class="flex items-center px-6 py-4 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    Write
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center px-6 py-4 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    Settings
+                  </a>
+                  <a
+                    href="#"
+                    onclick="showLogoutModal(event)"
+                    class="flex items-center px-6 py-4 text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <svg
+                      class="w-5 h-5 mr-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    Sign out
+                  </a>
+                </nav>
+              </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="w-full md:w-3/4">
+              <!-- Dashboard Overview -->
+              <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 class="text-2xl font-bold mb-4">Dashboard Overview</h2>
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold">Total Posts</h3>
+                    <p class="text-3xl font-bold"><%= stats.totalPosts %></p>
+                  </div>
+                  <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold">Total Views</h3>
+                    <p class="text-3xl font-bold"><%= stats.totalViews %></p>
+                  </div>
+                  <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold">Total Likes</h3>
+                    <p class="text-3xl font-bold"><%= stats.totalLikes %></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Posts -->
+              <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 class="text-2xl font-bold mb-4">Recent Posts</h2>
+                <div class="space-y-4">
+                  <% if (recentPosts && recentPosts.length > 0) { %> <%
+                  recentPosts.forEach(post => { %>
+                  <div class="border-b pb-4">
+                    <h3 class="text-lg font-semibold"><%= post.title %></h3>
+                    <div class="flex space-x-4 text-sm text-gray-600">
+                      <span>Views: <%= post.views %></span>
+                      <span>Likes: <%= post.likes %></span>
+                      <span
+                        >Posted: <%= new
+                        Date(post.createdAt).toLocaleDateString() %></span
+                      >
+                    </div>
+                  </div>
+                  <% }) %> <% } else { %>
+                  <p class="text-gray-500">No posts yet</p>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="bg-black pb-5">
+        <!-- Footer content -->
+      </footer>
     </div>
 
     <!-- Modals -->
     <!-- Logout Modal -->
     <div id="logoutModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl transform transition-all">
-                <div class="text-center">
-                    <!-- Icon -->
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </div>
-                    
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Sign out</h3>
-                    <p class="text-sm text-gray-500 mb-6">
-                        Are you sure you want to sign out?
-                    </p>
-                    
-                    <!-- Buttons -->
-                    <div class="flex justify-center space-x-3">
-                        <button onclick="hideLogoutModal()" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                            Cancel
-                        </button>
-                        <form action="/logout" method="POST" class="inline">
-                            <button type="submit" 
-                                    class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
-                                Sign out
-                            </button>
-                        </form>
-                    </div>
-                </div>
+      <div
+        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+      ></div>
+
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl transform transition-all"
+        >
+          <div class="text-center">
+            <!-- Icon -->
+            <div
+              class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4"
+            >
+              <svg
+                class="h-6 w-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
             </div>
+
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Sign out</h3>
+            <p class="text-sm text-gray-500 mb-6">
+              Are you sure you want to sign out?
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex justify-center space-x-3">
+              <button
+                onclick="hideLogoutModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <form action="/logout" method="POST" class="inline">
+                <button
+                  type="submit"
+                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
+                >
+                  Sign out
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Image Upload Modal -->
     <div id="imageModal" class="fixed inset-0 z-50 hidden">
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
-                <!-- Modal content -->
-                <div class="mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Update Profile Image</h3>
-                    <p class="text-sm text-gray-500 mt-1">Choose a new profile picture</p>
-                </div>
-                
-                <!-- Image preview -->
-                <div class="mb-4">
-                    <img id="imagePreview" 
-                         src="<%= user.image || 'https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png' %>" 
-                         class="w-32 h-32 rounded-full mx-auto object-cover border-2 border-gray-200">
-                </div>
-                
-                <!-- Upload form -->
-                <form id="imageUploadForm" class="space-y-4">
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" 
-                                onclick="hideImageModal()" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                            Cancel
-                        </button>
-                        <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-black border border-transparent rounded-md hover:bg-gray-800">
-                            Save Changes
-                        </button>
-                    </div>
-                </form>
+      <div
+        class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+      ></div>
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+          <!-- Modal content -->
+          <div class="mb-4">
+            <h3 class="text-lg font-medium text-gray-900">
+              Update Profile Image
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">
+              Choose a new profile picture
+            </p>
+          </div>
+
+          <!-- Image preview -->
+          <div class="mb-4">
+            <img
+              id="imagePreview"
+              src="<%= user.image || 'https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png' %>"
+              class="w-32 h-32 rounded-full mx-auto object-cover border-2 border-gray-200"
+            />
+          </div>
+
+          <!-- Upload form -->
+          <form id="imageUploadForm" class="space-y-4">
+            <div class="flex justify-end space-x-3">
+              <button
+                type="button"
+                onclick="hideImageModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-black border border-transparent rounded-md hover:bg-gray-800"
+              >
+                Save Changes
+              </button>
             </div>
+          </form>
         </div>
+      </div>
     </div>
 
     <!-- Scripts -->
     <script>
-        // Logout Modal Functions
-        function showLogoutModal(event) {
-            event.preventDefault();
-            const modal = document.getElementById('logoutModal');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+      // Logout Modal Functions
+      function showLogoutModal(event) {
+        event.preventDefault();
+        const modal = document.getElementById("logoutModal");
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      }
+
+      function hideLogoutModal() {
+        const modal = document.getElementById("logoutModal");
+        modal.classList.add("hidden");
+        document.body.style.overflow = "auto";
+      }
+
+      // Image Upload Functions
+      let selectedFile = null;
+
+      async function updateProfileImage(input) {
+        if (!input.files || !input.files[0]) return;
+
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+          const response = await fetch("/update-profile-image", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Update all profile images on the page
+            const profileImages =
+              document.querySelectorAll('img[alt="Profile"]');
+            profileImages.forEach((img) => {
+              img.src = data.imageUrl;
+            });
+
+            hideImageModal();
+
+            // Show success message
+            alert("Profile image updated successfully!");
+          } else {
+            throw new Error(data.error || "Failed to update image");
+          }
+        } catch (err) {
+          console.error("Error updating profile image:", err);
+          alert("Failed to update profile image. Please try again.");
         }
+      }
 
-        function hideLogoutModal() {
-            const modal = document.getElementById('logoutModal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
+      function hideImageModal() {
+        document.getElementById("imageModal").classList.add("hidden");
+        selectedFile = null;
+        document.getElementById("imagePreview").src =
+          '<%= user.image || "https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png" %>';
+      }
 
-        // Image Upload Functions
-        let selectedFile = null;
+      // Image Upload Form Handler
+      document
+        .getElementById("imageUploadForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
 
-        function updateProfileImage(input) {
-            if (input.files && input.files[0]) {
-                selectedFile = input.files[0];
-                
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').src = e.target.result;
-                }
-                reader.readAsDataURL(selectedFile);
-                
-                // Show modal
-                document.getElementById('imageModal').classList.remove('hidden');
+          if (!selectedFile) return;
+
+          const formData = new FormData();
+          formData.append("image", selectedFile);
+
+          try {
+            const response = await fetch("/update-profile-image", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              // Update all profile images on the page
+              const profileImages =
+                document.querySelectorAll('img[alt="Profile"]');
+              profileImages.forEach((img) => (img.src = data.imageUrl));
+
+              hideImageModal();
+
+              // Show success message
+              alert("Profile image updated successfully!");
+            } else {
+              throw new Error(data.error || "Failed to update image");
             }
-        }
-
-        function hideImageModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-            selectedFile = null;
-            document.getElementById('imagePreview').src = '<%= user.image || "https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png" %>';
-        }
-
-        // Image Upload Form Handler
-        document.getElementById('imageUploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!selectedFile) return;
-            
-            const formData = new FormData();
-            formData.append('image', selectedFile);
-            
-            try {
-                const response = await fetch('/update-profile-image', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Update all profile images on the page
-                    const profileImages = document.querySelectorAll('img[alt="Profile"]');
-                    profileImages.forEach(img => img.src = data.imageUrl);
-                    
-                    hideImageModal();
-                    
-                    // Show success message
-                    alert('Profile image updated successfully!');
-                } else {
-                    throw new Error(data.error || 'Failed to update image');
-                }
-            } catch (err) {
-                console.error('Error updating profile image:', err);
-                alert('Failed to update profile image. Please try again.');
-            }
+          } catch (err) {
+            console.error("Error updating profile image:", err);
+            alert("Failed to update profile image. Please try again.");
+          }
         });
 
-        // Modal Close Events
-        document.addEventListener('click', (e) => {
-            const logoutModal = document.getElementById('logoutModal');
-            const imageModal = document.getElementById('imageModal');
-            
-            if (!logoutModal.classList.contains('hidden')) {
-                const modalContent = logoutModal.querySelector('.bg-white');
-                if (!modalContent.contains(e.target) && !e.target.closest('a[onclick="showLogoutModal(event)"]')) {
-                    hideLogoutModal();
-                }
+      // Modal Close Events
+      document.addEventListener("click", (e) => {
+        const logoutModal = document.getElementById("logoutModal");
+        const imageModal = document.getElementById("imageModal");
+
+        if (!logoutModal.classList.contains("hidden")) {
+          const modalContent = logoutModal.querySelector(".bg-white");
+          if (
+            !modalContent.contains(e.target) &&
+            !e.target.closest('a[onclick="showLogoutModal(event)"]')
+          ) {
+            hideLogoutModal();
+          }
+        }
+
+        if (!imageModal.classList.contains("hidden")) {
+          const modalContent = imageModal.querySelector(".bg-white");
+          if (
+            !modalContent.contains(e.target) &&
+            !e.target.closest("#profileImage")
+          ) {
+            hideImageModal();
+          }
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          hideLogoutModal();
+          hideImageModal();
+        }
+      });
+
+      // Add this script for image upload functionality
+      document
+        .getElementById("imageUploadForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+
+          try {
+            const response = await fetch("/upload-image", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              // Refresh the page to show new image
+              window.location.reload();
+            } else {
+              alert(data.error || "Upload failed");
             }
-            
-            if (!imageModal.classList.contains('hidden')) {
-                const modalContent = imageModal.querySelector('.bg-white');
-                if (!modalContent.contains(e.target) && !e.target.closest('#profileImage')) {
-                    hideImageModal();
-                }
-            }
+          } catch (err) {
+            console.error("Upload error:", err);
+            alert("Upload failed");
+          }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                hideLogoutModal();
-                hideImageModal();
-            }
-        });
+      function copyImageUrl(url) {
+        const fullUrl = window.location.origin + url;
+        navigator.clipboard
+          .writeText(fullUrl)
+          .then(() => alert("Image URL copied!"))
+          .catch((err) => console.error("Failed to copy:", err));
+      }
     </script>
-</body>
+  </body>
 </html>

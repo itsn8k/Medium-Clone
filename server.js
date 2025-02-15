@@ -1,88 +1,119 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
-const MongoStore = require('connect-mongo');
+const MongoStore = require("connect-mongo");
 const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const details = require("./models/details");
 const BlogPost = require("./models/blog"); // Ensure this model is correctly defined
 const app = express();
-const fs = require('fs');
-const cookieParser = require('cookie-parser');
-const crypto = require('crypto');
+const fs = require("fs");
+const cookieParser = require("cookie-parser");
+const crypto = require("crypto");
 
 // Dynamic port handling
 const PORT = process.env.PORT || 5000;
 
-// Update MongoDB connection configuration
-const username = encodeURIComponent(process.env.MONGODB_USERNAME);
-const password = encodeURIComponent(process.env.MONGODB_PASSWORD);
-const database = process.env.MONGODB_DATABASE;
-const cluster = 'cluster.y7axs'; // Your cluster name
+// MongoDB Connection
+const mongoURI = process.env.MONGODB_URI;
 
-const mongoURI = `mongodb+srv://${username}:${password}@${cluster}.mongodb.net/${database}?retryWrites=true&w=majority`;
+mongoose
+  .connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverApi: {
+      version: "1",
+      strict: true,
+      deprecationErrors: true,
+    },
+  })
+  .then(() => {
+    console.log("MongoDB Connected Successfully");
+    // Initialize Express app after successful connection
+    initializeApp();
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
 
-// Enhanced MongoDB connection options
-const mongooseOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 30000,
-  socketTimeoutMS: 45000,
-  family: 4,  // Force IPv4
-  retryWrites: true,
-  // Add these for Atlas
-  ssl: true,
-  authSource: 'admin',
-  replicaSet: 'atlas-yeqx7i-shard-0'
-};
+// MongoDB Connection Events
+mongoose.connection.on("error", (err) => {
+  console.error("MongoDB connection error:", err);
+});
 
-// Connect with retry mechanism
-const connectWithRetry = () => {
-  console.log('MongoDB connection with retry');
-  mongoose.connect(mongoURI, mongooseOptions)
-    .then(() => {
-      console.log('MongoDB is connected');
-      console.log('Database Name:', mongoose.connection.name);
-      console.log('Host:', mongoose.connection.host);
-      app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-      });
+mongoose.connection.on("disconnected", () => {
+  console.log("MongoDB disconnected");
+});
+
+// Function to initialize Express app
+function initializeApp() {
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(cookieParser());
+  app.use(methodOverride("_method"));
+
+  // Configure session middleware
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({
+        mongoUrl: mongoURI,
+        collectionName: "sessions",
+      }),
+      cookie: {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      },
     })
-    .catch(err => {
-      console.error('MongoDB connection unsuccessful, retry after 5 seconds.');
-      console.error(err);
-      setTimeout(connectWithRetry, 5000);
-    });
-};
+  );
 
-// Initial connection
-connectWithRetry();
+  // Set up view engine and static files
+  app.set("view engine", "ejs");
+  app.use(express.static(path.join(__dirname, "public")));
+  app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// Connection event handlers
-mongoose.connection.on('connected', () => {
-  console.log('Mongoose connected to MongoDB');
+  // Add user data to locals
+  app.use((req, res, next) => {
+    res.locals.user = req.session.user;
+    next();
+  });
+
+  // Start the server
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+// Handle MongoDB connection events
+mongoose.connection.on("connected", () => {
+  console.log("Mongoose connected to MongoDB");
 });
 
-mongoose.connection.on('error', (err) => {
-  console.error('Mongoose connection error:', err);
+mongoose.connection.on("error", (err) => {
+  console.error("Mongoose connection error:", err);
 });
 
-mongoose.connection.on('disconnected', () => {
-  console.log('Mongoose disconnected');
+mongoose.connection.on("disconnected", () => {
+  console.log("Mongoose disconnected");
 });
 
 // Graceful shutdown
-process.on('SIGINT', async () => {
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received");
   try {
     await mongoose.connection.close();
-    console.log('Mongoose connection closed through app termination');
+    console.log("Mongoose connection closed through app termination");
     process.exit(0);
   } catch (err) {
-    console.error('Error closing Mongoose connection:', err);
+    console.error("Error closing Mongoose connection:", err);
     process.exit(1);
   }
 });
@@ -95,32 +126,35 @@ app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use(cookieParser());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "secret-key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: mongoURI,
-      ttl: 14 * 24 * 60 * 60, // = 14 days. Default
-      autoRemove: 'native', // Default
-      crypto: {
-        secret: process.env.SESSION_SECRET || "secret-key",
-      },
-      touchAfter: 24 * 3600 // time period in seconds
+      collectionName: "sessions",
+      stringify: false,
+      autoRemove: "interval",
+      autoRemoveInterval: 24 * 60, // 1 day in minutes
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
-      sameSite: 'lax'
-    }
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    },
   })
 );
 
-// Add error handling for the session store
+// Add this right after session configuration
 app.use((req, res, next) => {
   if (!req.session) {
-    return next(new Error('Session store unavailable'));
+    return next(new Error("Session initialization failed"));
   }
+  next();
+});
+
+// Make sure this is before any routes
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
   next();
 });
 
@@ -134,86 +168,84 @@ app.use(express.json());
 // Configure view engine
 app.set("view engine", "ejs");
 
-// Create upload directories if they don't exist
-const uploadDirs = [
-  'public/uploads',
-  'public/uploads/profiles',
-  'public/uploads/blogs',
-  'public/uploads/others'
-];
+// Update the upload directory structure
+const uploadDir = "public/uploads";
 
-uploadDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-    console.log(`Created directory: ${dir}`);
-  }
-});
+// Create upload directory if it doesn't exist
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log(`Created directory: ${uploadDir}`);
+}
 
-// Make sure uploads directory is publicly accessible
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+// Make uploads directory publicly accessible
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// Update multer configuration for all file uploads
+// Update multer configuration for blog post images only
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Check file type to determine destination
-    if (file.fieldname === 'image') {
-      cb(null, 'public/uploads/profiles');
-    } else if (file.fieldname === 'blogImage') {
-      cb(null, 'public/uploads/blogs');
-    } else {
-      cb(null, 'public/uploads/others');
-    }
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
+    // Create a clean filename with timestamp and random string
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    cb(null, `post-${uniqueSuffix}${fileExtension}`);
+  },
 });
 
-// Multer file filter
+// Improve file filter for better security
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  // Allow only specific image types
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Not an image! Please upload an image.'), false);
+    cb(
+      new Error(
+        "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed."
+      ),
+      false
+    );
   }
 };
 
-// Configure multer with storage and file filter
+// Configure multer with improved settings
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  }
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+    files: 1, // Allow only 1 file per upload
+  },
 });
 
 // Add this after your multer configuration
 app.use((err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        // A Multer error occurred when uploading
-        console.error("Multer error:", err);
-        return res.render("er", {
-            title: "Upload Error",
-            message: "An error occurred while uploading the image. Please try again.",
-            redirectUrl: "/blog"
-        });
-    } else if (err) {
-        // An unknown error occurred
-        console.error("Unknown error:", err);
-        return res.render("er", {
-            title: "Error",
-            message: "An unexpected error occurred. Please try again.",
-            redirectUrl: "/blog"
-        });
-    }
-    next();
+  if (err instanceof multer.MulterError) {
+    // A Multer error occurred when uploading
+    console.error("Multer error:", err);
+    return res.render("er", {
+      title: "Upload Error",
+      message: "An error occurred while uploading the image. Please try again.",
+      redirectUrl: "/blog",
+    });
+  } else if (err) {
+    // An unknown error occurred
+    console.error("Unknown error:", err);
+    return res.render("er", {
+      title: "Error",
+      message: "An unexpected error occurred. Please try again.",
+      redirectUrl: "/blog",
+    });
+  }
+  next();
 });
 
 // Add middleware definitions at the top of server.js, after your imports but before routes
 const requireAuth = (req, res, next) => {
   if (!req.session.userId) {
-    return res.redirect('/signin');
+    return res.redirect("/signin");
   }
   next();
 };
@@ -223,7 +255,7 @@ const checkAuth = (req, res, next) => {
   if (req.session.userId || req.query.guest) {
     next();
   } else {
-    res.redirect('/signin');
+    res.redirect("/signin");
   }
 };
 
@@ -232,228 +264,78 @@ const checkFullAuth = (req, res, next) => {
   if (req.session.userId) {
     next();
   } else {
-    res.render('signin', {
-      error: 'Please sign in to access this feature',
-      isGuest: req.query.guest
+    res.render("signin", {
+      error: "Please sign in to access this feature",
+      isGuest: req.query.guest,
     });
   }
 };
 
 // Add guest-check to the header navigation
 app.use((req, res, next) => {
-  res.locals.isGuest = req.query.guest === 'true';
+  res.locals.isGuest = req.query.guest === "true";
   res.locals.isAuthenticated = !!req.session.userId;
   next();
 });
 
-// Authentication Routes - Place these after your middleware configurations but before other routes
-
-// GET Routes for Authentication
-app.get("/", async (req, res) => {
-  try {
-    if (req.session.userId) {
-      res.redirect('/blog');
-    } else {
-      // Fetch top 3 trending posts based on views and likes
-      const trendingPosts = await BlogPost.aggregate([
-        {
-          $addFields: {
-            trendingScore: {
-              $add: [
-                { $ifNull: ["$views", 0] },
-                { $size: { $ifNull: ["$likes", []] } }
-              ]
-            }
-          }
-        },
-        { $sort: { trendingScore: -1 } },
-        { $limit: 3 },
-        {
-          $lookup: {
-            from: "details",
-            localField: "author",
-            foreignField: "username",
-            as: "authorDetails"
-          }
-        },
-        {
-          $addFields: {
-            authorImage: { $arrayElemAt: ["$authorDetails.image", 0] }
-          }
-        },
-        {
-          $project: {
-            _id: 1,
-            title: 1,
-            author: 1,
-            authorImage: 1,
-            createdAt: 1,
-            views: { $ifNull: ["$views", 0] },
-            likes: { $size: { $ifNull: ["$likes", []] } },
-            readTime: {
-              $concat: [
-                {
-                  $toString: {
-                    $ceil: {
-                      $divide: [
-                        { $size: { $split: ["$body", " "] } },
-                        200
-                      ]
-                    }
-                  }
-                },
-                " min read"
-              ]
-            }
-          }
-        }
-      ]);
-
-      // Format the trending posts for display
-      const formattedTrendingPosts = trendingPosts.map((post, index) => ({
-        number: (index + 1).toString().padStart(2, '0'),
-        image: post.authorImage || 'https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png',
-        author: post.author,
-        title: post.title,
-        readTime: post.readTime,
-        views: post.views > 999 ? `${(post.views/1000).toFixed(1)}K` : post.views.toString(),
-        likes: post.likes,
-        postId: post._id
-      }));
-
-      res.render("welcome", { trendingPosts: formattedTrendingPosts });
-    }
-  } catch (err) {
-    console.error("Error fetching trending posts:", err);
-    // Fallback to static data if there's an error
-    const fallbackPosts = [
-      {
-        number: "01",
-        image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
-        author: "John Smith",
-        title: "The Future of Web Development in 2024",
-        readTime: "5 min read",
-        views: "1.2K"
-      },
-      {
-        number: "02",
-        image: "https://images.unsplash.com/photo-1522252234503-e356532cafd5",
-        author: "Sarah Johnson",
-        title: "Understanding Modern JavaScript Patterns",
-        readTime: "7 min read",
-        views: "956"
-      },
-      {
-        number: "03",
-        image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-        author: "David Chen",
-        title: "Building Scalable Applications with Node.js",
-        readTime: "8 min read",
-        views: "843"
-      }
-    ];
-    res.render("welcome", { trendingPosts: fallbackPosts });
-  }
-});
-
+// Authentication Routes
 app.get("/signin", (req, res) => {
   if (req.session.userId) {
-    res.redirect("/dashboard");
+    res.redirect("/blog");
   } else {
-    res.render("signin", { title: "Sign In" });
+    res.render("signin", {
+      title: "Sign In",
+      error: null,
+      values: {},
+    });
   }
 });
 
 app.get("/signup", (req, res) => {
   if (req.session.userId) {
-    res.redirect("/dashboard");
+    res.redirect("/blog");
   } else {
-    res.render("signup", { title: "Sign Up" });
-  }
-});
-
-// POST Routes for Authentication
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password, remember_me } = req.body;
-    const user = await details.findOne({ email: email.toLowerCase() });
-    
-    if (!user) {
-      return res.render("signin", {
-        error: "Invalid email or password",
-        values: req.body
-      });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.render("signin", {
-        error: "Invalid email or password",
-        values: req.body
-      });
-    }
-
-    // Set session
-    req.session.userId = user._id;
-    req.session.user = {
-      name: user.name,
-      username: user.username,
-      email: user.email
-    };
-
-    // Handle remember me
-    if (remember_me) {
-      const token = crypto.randomBytes(32).toString('hex');
-      user.rememberToken = token;
-      await user.save();
-      
-      // Set remember_token cookie
-      res.cookie('remember_token', token, {
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
-      });
-    }
-
-    // Always redirect to /blog instead of /dashboard
-    return res.redirect("/blog");
-
-  } catch (err) {
-    console.error("Login error:", err);
-    res.render("signin", {
-      error: "Login failed. Please try again.",
-      values: req.body
+    res.render("signup", {
+      title: "Sign Up",
+      error: null,
+      values: {},
     });
   }
 });
 
-// Update signup route to handle image upload
-app.post("/signup", upload.single('image'), async (req, res) => {
+// Signup Route
+app.post("/signup", upload.single("image"), async (req, res) => {
   try {
-    const { name, email, username, password } = req.body;
-    
+    const { name, email, username, password, gender } = req.body;
+
     // Check if user exists
     const existingUser = await details.findOne({
-      $or: [{ email: email.toLowerCase() }, { username }]
+      $or: [{ email: email.toLowerCase() }, { username }],
     });
 
     if (existingUser) {
       return res.render("signup", {
         error: "Email or username already exists",
-        values: req.body
+        values: req.body,
       });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create new user with optional image
+
+    // Set default image if none provided
+    const userImage = req.file
+      ? `/uploads/${req.file.filename}`
+      : "https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png";
+
+    // Create new user
     const user = new details({
       name,
       email: email.toLowerCase(),
       username,
       password: hashedPassword,
-      image: req.file ? `/uploads/profiles/${req.file.filename}` : undefined
+      gender,
+      image: userImage,
     });
 
     await user.save();
@@ -464,7 +346,7 @@ app.post("/signup", upload.single('image'), async (req, res) => {
       name: user.name,
       username: user.username,
       email: user.email,
-      image: user.image
+      image: user.image,
     };
 
     res.redirect("/blog");
@@ -472,7 +354,39 @@ app.post("/signup", upload.single('image'), async (req, res) => {
     console.error("Signup error:", err);
     res.render("signup", {
       error: "Signup failed. Please try again.",
-      values: req.body
+      values: req.body,
+    });
+  }
+});
+
+// Login route
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await details.findOne({ email: email.toLowerCase() });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.render("signin", {
+        error: "Invalid email or password",
+        values: { email },
+      });
+    }
+
+    // Set session
+    req.session.userId = user._id;
+    req.session.user = {
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      image: user.image,
+    };
+
+    res.redirect("/blog");
+  } catch (err) {
+    console.error("Login error:", err);
+    res.render("signin", {
+      error: "Login failed. Please try again.",
+      values: { email },
     });
   }
 });
@@ -480,10 +394,10 @@ app.post("/signup", upload.single('image'), async (req, res) => {
 // Routes
 app.get("/", async (req, res) => {
   if (req.session.userId) {
-    res.redirect('/blog');
+    res.redirect("/blog");
   } else {
     res.render("signin", {
-      title: "Sign In - Medium"
+      title: "Sign In - Medium",
     });
   }
 });
@@ -517,7 +431,7 @@ app.get("/view", (req, res) => {
 app.get("/post", isAuthenticated, (req, res) => {
   res.render("index-5", {
     title: "Create New Story - Medium",
-    user: req.session.user
+    user: req.session.user,
   });
 });
 
@@ -528,99 +442,101 @@ app.get("/home", (req, res) => {
 // Dashboard Route
 app.get("/dashboard", isAuthenticated, async (req, res) => {
   try {
-    const user = {
-      name: req.session.user.name,
-      username: req.session.user.username,
-      email: req.session.user.email,
-      image: req.session.user.image
-    };
+    // Get user's posts with views and likes
+    const userPosts = await BlogPost.find({
+      user: req.session.userId,
+    }).sort({ createdAt: -1 });
 
-    // Get user's blog posts with views and likes
-    const userPosts = await BlogPost.find({ author: user.username })
-      .select('title createdAt views likes comments') // Select specific fields
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .lean(); // Convert to plain JavaScript objects
-
-    // Format the posts data
-    const formattedPosts = userPosts.map(post => ({
-      ...post,
-      viewCount: post.views || 0,
-      likeCount: Array.isArray(post.likes) ? post.likes.length : 0,
-      commentCount: Array.isArray(post.comments) ? post.comments.length : 0,
-      formattedDate: new Date(post.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    }));
-
-    // Calculate stats using aggregation
-    const [stats] = await BlogPost.aggregate([
-      { $match: { author: user.username } },
-      {
-        $group: {
-          _id: null,
-          totalPosts: { $sum: 1 },
-          totalViews: { 
-            $sum: { 
-              $cond: [
-                { $ifNull: ["$views", false] },
-                "$views",
-                0
-              ]
-            }
-          },
-          totalLikes: {
-            $sum: {
-              $size: {
-                $cond: [
-                  { $isArray: "$likes" },
-                  "$likes",
-                  []
-                ]
-              }
-            }
-          },
-          totalComments: {
-            $sum: {
-              $size: {
-                $cond: [
-                  { $isArray: "$comments" },
-                  "$comments",
-                  []
-                ]
-              }
-            }
-          }
-        }
-      }
-    ]) || {
-      totalPosts: 0,
-      totalViews: 0,
-      totalLikes: 0,
-      totalComments: 0
+    // Calculate total stats
+    const stats = {
+      totalPosts: userPosts.length,
+      totalViews: userPosts.reduce((sum, post) => sum + (post.views || 0), 0),
+      totalLikes: userPosts.reduce(
+        (sum, post) => sum + (post.likes?.length || 0),
+        0
+      ),
+      recentPosts: userPosts.slice(0, 5).map((post) => ({
+        title: post.title,
+        views: post.views || 0,
+        likes: post.likes?.length || 0,
+        createdAt: post.createdAt,
+      })),
     };
 
     res.render("index-3", {
-      user,
-      posts: formattedPosts,
-      stats,
-      title: "Dashboard - Medium"
+      user: req.session.user,
+      stats: stats,
+      recentPosts: stats.recentPosts,
     });
   } catch (err) {
     console.error("Dashboard error:", err);
-    res.status(500).render("error", {
-      error: "Failed to load dashboard",
-      message: "Please try again later"
+    res.render("error", {
+      message: "Error loading dashboard",
     });
   }
 });
 
+// Image upload route
+app.post(
+  "/upload-image",
+  isAuthenticated,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No image provided" });
+      }
+
+      const imageUrl = `/uploads/${req.file.filename}`;
+
+      // Save image reference to user's images collection
+      await saveUserImage(req.session.userId, imageUrl, req.file.originalname);
+
+      res.json({
+        success: true,
+        imageUrl: imageUrl,
+        message: "Image uploaded successfully",
+      });
+    } catch (err) {
+      console.error("Image upload error:", err);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  }
+);
+
+// Helper function to get user's images
+async function getUserImages(userId) {
+  try {
+    const user = await details.findById(userId);
+    return user.uploadedImages || [];
+  } catch (err) {
+    console.error("Error getting user images:", err);
+    return [];
+  }
+}
+
+// Helper function to save image reference
+async function saveUserImage(userId, imageUrl, originalName) {
+  try {
+    await details.findByIdAndUpdate(userId, {
+      $push: {
+        uploadedImages: {
+          url: imageUrl,
+          name: originalName,
+          uploadedAt: new Date(),
+        },
+      },
+    });
+  } catch (err) {
+    console.error("Error saving image reference:", err);
+    throw err;
+  }
+}
+
 // Blog Route with Category and Search Filtering
 app.get("/blog", checkAuth, async (req, res) => {
   try {
-    const isGuest = req.query.guest === 'true';
+    const isGuest = req.query.guest === "true";
     const searchQuery = req.query.search || "";
     const selectedCategory = req.query.category || "";
 
@@ -639,9 +555,7 @@ app.get("/blog", checkAuth, async (req, res) => {
     }
 
     // Fetch blogs and sort by createdAt in descending order
-    const blogs = await BlogPost.find(filter)
-      .sort({ createdAt: -1 })
-      .lean();
+    const blogs = await BlogPost.find(filter).sort({ createdAt: -1 }).lean();
 
     // Group blogs by date
     const groupedBlogs = blogs.reduce((groups, blog) => {
@@ -652,14 +566,14 @@ app.get("/blog", checkAuth, async (req, res) => {
 
       let dateString;
       if (date.toDateString() === today.toDateString()) {
-        dateString = 'Today';
+        dateString = "Today";
       } else if (date.toDateString() === yesterday.toDateString()) {
-        dateString = 'Yesterday';
+        dateString = "Yesterday";
       } else {
-        dateString = date.toLocaleDateString('en-US', { 
-          weekday: 'long',
-          month: 'long', 
-          day: 'numeric'
+        dateString = date.toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
         });
       }
 
@@ -672,12 +586,12 @@ app.get("/blog", checkAuth, async (req, res) => {
 
     res.render("index", {
       title: "Blog",
-      userName: req.session.user ? req.session.user.name : 'Guest',
+      userName: req.session.user ? req.session.user.name : "Guest",
       groupedBlogs,
       selectedCategory,
       searchQuery,
       updateMessage: req.session.updateMessage,
-      isGuest: isGuest
+      isGuest: isGuest,
     });
 
     // Clear update message after rendering
@@ -693,47 +607,59 @@ app.get("/blog", checkAuth, async (req, res) => {
 
 // Blog Post Route
 app.post("/blog", upload.single("image"), async (req, res) => {
-    try {
-        const { title, snippet, body, type } = req.body;
-        let imagePath = null;
+  try {
+    const { title, snippet, body, type } = req.body;
 
-        if (req.file) {
-            // Store the path relative to the public directory
-            imagePath = `/uploads/${req.file.filename}`;
-            console.log("Uploaded image path:", imagePath);
-        }
-
-        if (!req.session.userId) {
-            return res.render("error", {
-                title: "Unauthorized",
-                message: "You must be logged in to post a blog."
-            });
-        }
-
-        const newBlogPost = new BlogPost({
-            title,
-            snippet,
-            body,
-            type,
-            image: imagePath, // Use the relative path
-            user: req.session.userId,
-            author: req.session.user.name
-        });
-
-        await newBlogPost.save();
-        res.render("bs", {
-            title: "Blog Post Created",
-            message: "Blog post created successfully!",
-            redirectUrl: "/blog"
-        });
-    } catch (err) {
-        console.error("Error creating blog post:", err);
-        res.render("er", {
-            title: "Error",
-            message: "An error occurred while creating the blog post. Please try again.",
-            redirectUrl: "/blog"
-        });
+    // Check for required image
+    if (!req.file) {
+      return res.render("er", {
+        title: "Error",
+        message: "Please upload an image for your blog post.",
+        redirectUrl: "/post",
+      });
     }
+
+    // Set the correct image path
+    const imagePath = `/uploads/${req.file.filename}`;
+    console.log("Uploaded image path:", imagePath);
+
+    if (!req.session.userId) {
+      return res.render("error", {
+        title: "Unauthorized",
+        message: "You must be logged in to post a blog.",
+      });
+    }
+
+    // Create and save the blog post
+    const newBlogPost = new BlogPost({
+      title,
+      snippet,
+      body,
+      type,
+      image: imagePath,
+      user: req.session.userId,
+      author: req.session.user.name,
+      createdAt: new Date(),
+      views: 0,
+      likes: [],
+      comments: [],
+    });
+
+    await newBlogPost.save();
+    res.render("bs", {
+      title: "Blog Post Created",
+      message: "Blog post created successfully!",
+      redirectUrl: "/blog",
+    });
+  } catch (err) {
+    console.error("Error creating blog post:", err);
+    res.render("er", {
+      title: "Error",
+      message:
+        "An error occurred while creating the blog post. Please try again.",
+      redirectUrl: "/post",
+    });
+  }
 });
 
 // Route to fetch and display a single blog post
@@ -822,14 +748,12 @@ app.delete("/blog/:id", async (req, res) => {
 
 // Logout Route
 app.post("/logout", (req, res) => {
-  // Clear the session
-  req.session.destroy();
-  
-  // Clear the remember_token cookie
-  res.clearCookie('remember_token');
-  
-  // Redirect to signin page
-  res.redirect("/signin");
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Logout error:", err);
+    }
+    res.redirect("/signin");
+  });
 });
 
 // GET route to display the edit form
@@ -837,22 +761,22 @@ app.get("/blog/:id/edit", isAuthenticated, async (req, res) => {
   try {
     const blogPost = await BlogPost.findById(req.params.id);
     if (!blogPost) {
-      return res.status(404).redirect('/blog');
+      return res.status(404).redirect("/blog");
     }
-    
-    // Check if user is the author
-    if (blogPost.author !== req.session.user.username) {
-      return res.status(403).redirect('/blog');
+
+    // Check if user is the author by comparing user IDs instead of username
+    if (blogPost.user.toString() !== req.session.userId.toString()) {
+      return res.status(403).redirect("/blog");
     }
 
     res.render("index-4", {
       title: "Edit Story | Medium",
       blogPost,
-      user: req.session.user
+      user: req.session.user,
     });
   } catch (err) {
     console.error("Error loading edit page:", err);
-    res.redirect('/blog');
+    res.redirect("/blog");
   }
 });
 
@@ -874,25 +798,15 @@ app.get("/user", (req, res) => {
 // PUT route to handle blog post updates
 app.put("/blog/:id", upload.single("image"), requireAuth, async (req, res) => {
   try {
-    const { title, snippet, body } = req.body;
+    const { title, snippet, body, type } = req.body;
     const blogId = req.params.id;
-
-    // Validate blogId
-    if (!mongoose.Types.ObjectId.isValid(blogId)) {
-      return res.status(400).render("error", {
-        title: "Invalid Blog ID",
-        message: "The provided blog ID is invalid."
-      });
-    }
 
     // Find the blog post
     const blogPost = await BlogPost.findById(blogId);
-
-    // Check if post exists
     if (!blogPost) {
       return res.status(404).render("error", {
         title: "Not Found",
-        message: "Blog post not found."
+        message: "Blog post not found.",
       });
     }
 
@@ -900,7 +814,7 @@ app.put("/blog/:id", upload.single("image"), requireAuth, async (req, res) => {
     if (blogPost.user.toString() !== req.session.userId.toString()) {
       return res.status(403).render("error", {
         title: "Unauthorized",
-        message: "You do not have permission to edit this post."
+        message: "You do not have permission to edit this post.",
       });
     }
 
@@ -908,51 +822,44 @@ app.put("/blog/:id", upload.single("image"), requireAuth, async (req, res) => {
     const updateData = {
       title,
       snippet,
-      body
+      body,
+      type,
     };
 
     // Handle image upload if provided
     if (req.file) {
       updateData.image = `/uploads/${req.file.filename}`;
-      
+
       // Delete old image if it exists
       if (blogPost.image) {
-        const oldImagePath = path.join(__dirname, 'public', blogPost.image);
+        const oldImagePath = path.join(__dirname, "public", blogPost.image);
         try {
           if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
           }
         } catch (err) {
-          console.error('Error deleting old image:', err);
+          console.error("Error deleting old image:", err);
         }
       }
     }
 
-    // Update the blog post
-    const updatedPost = await BlogPost.findByIdAndUpdate(
-      blogId,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const updatedPost = await BlogPost.findByIdAndUpdate(blogId, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!updatedPost) {
-      throw new Error('Failed to update blog post');
-    }
-
-    // Show success message and redirect to main page
-    req.session.updateMessage = "Blog post updated successfully!";
-    res.redirect("/blog"); // Redirect to main page instead of individual post
+    res.redirect(`/blog/${blogId}`);
   } catch (err) {
-    console.error('Error updating blog post:', err);
+    console.error("Error updating blog post:", err);
     res.render("error", {
       title: "Error",
-      message: "An error occurred while updating the blog post."
+      message: "An error occurred while updating the blog post.",
     });
   }
 });
 
 // Route to handle post likes
-app.post('/blog/:id/like', checkFullAuth, async (req, res) => {
+app.post("/blog/:id/like", checkFullAuth, async (req, res) => {
   try {
     const blogId = req.params.id;
     const userId = req.session.userId;
@@ -960,7 +867,7 @@ app.post('/blog/:id/like', checkFullAuth, async (req, res) => {
 
     const blog = await BlogPost.findById(blogId);
     if (!blog) {
-      return res.status(404).json({ error: 'Blog post not found' });
+      return res.status(404).json({ error: "Blog post not found" });
     }
 
     const userLikeIndex = blog.likes.indexOf(userId);
@@ -971,30 +878,30 @@ app.post('/blog/:id/like', checkFullAuth, async (req, res) => {
     }
 
     await blog.save();
-    
-    res.json({ 
+
+    res.json({
       likes: blog.likes.length,
       isLiked: userLikeIndex === -1,
       notification: {
-        type: 'like',
+        type: "like",
         postTitle: blog.title,
-        userName: userName
-      }
+        userName: userName,
+      },
     });
   } catch (err) {
-    console.error('Error handling like:', err);
-    res.status(500).json({ error: 'Failed to update like' });
+    console.error("Error handling like:", err);
+    res.status(500).json({ error: "Failed to update like" });
   }
 });
 
 // Route to increment view count
-app.post('/blog/:id/view', async (req, res) => {
+app.post("/blog/:id/view", async (req, res) => {
   try {
     const blogId = req.params.id;
     const blog = await BlogPost.findById(blogId);
-    
+
     if (!blog) {
-      return res.status(404).json({ error: 'Blog post not found' });
+      return res.status(404).json({ error: "Blog post not found" });
     }
 
     // Initialize views if it doesn't exist
@@ -1004,20 +911,20 @@ app.post('/blog/:id/view', async (req, res) => {
 
     blog.views += 1;
     await blog.save();
-    
+
     // Emit notification to the post author (you'll need to implement WebSocket here)
     // For now, we'll just send it in the response
-    res.json({ 
+    res.json({
       views: blog.views,
       notification: {
-        type: 'view',
+        type: "view",
         postId: blogId,
-        title: blog.title
-      }
+        title: blog.title,
+      },
     });
   } catch (err) {
-    console.error('Error updating view count:', err);
-    res.status(500).json({ error: 'Failed to update view count' });
+    console.error("Error updating view count:", err);
+    res.status(500).json({ error: "Failed to update view count" });
   }
 });
 
@@ -1026,7 +933,7 @@ app.get("/auth/remember", async (req, res) => {
   try {
     if (req.cookies.remember_token) {
       const user = await details.findOne({
-        rememberToken: req.cookies.remember_token
+        rememberToken: req.cookies.remember_token,
       });
 
       if (user) {
@@ -1034,7 +941,7 @@ app.get("/auth/remember", async (req, res) => {
         req.session.user = {
           name: user.name,
           username: user.username,
-          email: user.email
+          email: user.email,
         };
         return res.redirect("/blog"); // Changed from /dashboard to /blog
       }
@@ -1049,49 +956,101 @@ app.get("/auth/remember", async (req, res) => {
 // Add this after your routes
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
-    if (error.code === 'LIMIT_FILE_SIZE') {
+    if (error.code === "LIMIT_FILE_SIZE") {
       return res.status(400).render("signup", {
         error: "File is too large. Maximum size is 5MB",
-        values: req.body
+        values: req.body,
       });
     }
   }
   next(error);
 });
 
-// Add profile image update route
-app.post("/update-profile-image", upload.single('image'), async (req, res) => {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ success: false, error: 'Not authenticated' });
+// Configure multer for profile images
+const profileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const profileUploadDir = "public/uploads/profiles";
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(profileUploadDir)) {
+      fs.mkdirSync(profileUploadDir, { recursive: true });
     }
-
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'No image provided' });
-    }
-
-    const imageUrl = `/uploads/profiles/${req.file.filename}`;
-    
-    // Update user's image in database
-    await details.findByIdAndUpdate(req.session.userId, {
-      image: imageUrl
-    });
-
-    // Update session
-    req.session.user.image = imageUrl;
-
-    res.json({
-      success: true,
-      imageUrl: imageUrl
-    });
-  } catch (err) {
-    console.error('Error updating profile image:', err);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to update profile image'
-    });
-  }
+    cb(null, profileUploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    cb(null, `profile-${uniqueSuffix}${fileExtension}`);
+  },
 });
+
+const profileUpload = multer({
+  storage: profileStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed."
+        )
+      );
+    }
+  },
+});
+
+// Profile image update route
+app.post(
+  "/update-profile-image",
+  isAuthenticated,
+  profileUpload.single("image"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: "No image provided",
+        });
+      }
+
+      const imageUrl = `/uploads/profiles/${req.file.filename}`;
+
+      // Update user in database
+      const updatedUser = await details.findByIdAndUpdate(
+        req.session.userId,
+        { image: imageUrl },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({
+          success: false,
+          error: "User not found",
+        });
+      }
+
+      // Update session
+      req.session.user = {
+        ...req.session.user,
+        image: imageUrl,
+      };
+
+      res.json({
+        success: true,
+        imageUrl: imageUrl,
+      });
+    } catch (err) {
+      console.error("Profile image update error:", err);
+      res.status(500).json({
+        success: false,
+        error: "Failed to update profile image",
+      });
+    }
+  }
+);
 
 // Update the isAuthenticated middleware to include user data
 function isAuthenticated(req, res, next) {
@@ -1099,21 +1058,22 @@ function isAuthenticated(req, res, next) {
     // Make sure user data is available in session
     if (!req.session.user) {
       // If user data is missing, fetch it from database
-      details.findById(req.session.userId)
-        .then(user => {
+      details
+        .findById(req.session.userId)
+        .then((user) => {
           if (user) {
             req.session.user = {
               name: user.name,
               username: user.username,
               email: user.email,
-              image: user.image
+              image: user.image,
             };
             next();
           } else {
             res.redirect("/signin");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Auth middleware error:", err);
           res.redirect("/signin");
         });
@@ -1126,10 +1086,10 @@ function isAuthenticated(req, res, next) {
 }
 
 // Add this route for handling blog post creation with image
-app.post("/create-post", upload.single('image'), async (req, res) => {
+app.post("/create-post", upload.single("image"), async (req, res) => {
   try {
     if (!req.session.userId) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return res.status(401).json({ error: "Not authenticated" });
     }
 
     const { title, content, description } = req.body;
@@ -1151,7 +1111,7 @@ app.post("/create-post", upload.single('image'), async (req, res) => {
       createdAt: new Date(),
       views: 0,
       likes: [],
-      comments: []
+      comments: [],
     });
 
     await newPost.save();
@@ -1159,13 +1119,13 @@ app.post("/create-post", upload.single('image'), async (req, res) => {
     res.json({
       success: true,
       post: newPost,
-      message: 'Post created successfully'
+      message: "Post created successfully",
     });
   } catch (err) {
-    console.error('Error creating post:', err);
+    console.error("Error creating post:", err);
     res.status(500).json({
       success: false,
-      error: 'Failed to create post'
+      error: "Failed to create post",
     });
   }
 });
@@ -1174,7 +1134,7 @@ app.post("/create-post", upload.single('image'), async (req, res) => {
 app.get("/post", isAuthenticated, (req, res) => {
   res.render("index-5", {
     title: "Create New Story - Medium",
-    user: req.session.user
+    user: req.session.user,
   });
 });
 
@@ -1182,7 +1142,7 @@ app.get("/post", isAuthenticated, (req, res) => {
 app.get("/preview", isAuthenticated, (req, res) => {
   res.render("index-5", {
     title: "Preview Story - Medium",
-    user: req.session.user
+    user: req.session.user,
   });
 });
 

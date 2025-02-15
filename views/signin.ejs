@@ -1,55 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign In - Medium: Read and write stories</title>
-</head>
-<link rel="stylesheet" href="/output.css">
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
+  </head>
+  <link rel="stylesheet" href="/output.css" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: "Inter", sans-serif;
     }
   </style>
-<body class="bg-gray-100">
-
-  <div class="flex min-h-screen">
-    <!-- Left Side: Image (Hidden on Mobile) -->
-    <div class="hidden md:flex w-1/2 bg-cover bg-center items-center justify-center"
-         style="background-image: url('https://images.unsplash.com/photo-1504376379689-8d54347b26c6?q=80&w=1436&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
-      <div class="flex items-center justify-center min-h-screen">
-        <blockquote class="text-center">
+  <body class="bg-gray-100">
+    <div class="flex min-h-screen">
+      <!-- Left Side: Image (Hidden on Mobile) -->
+      <div
+        class="hidden md:flex w-1/2 bg-cover bg-center items-center justify-center"
+        style="
+          background-image: url('https://images.unsplash.com/photo-1504376379689-8d54347b26c6?q=80&w=1436&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+        "
+      >
+        <div class="flex items-center justify-center min-h-screen">
+          <blockquote class="text-center">
             <p class="text-4xl font-semibold text-white italic leading-relaxed">
-            "Your Stories Await."
+              "Your Stories Await."
             </p>
-        </blockquote>
-      </div>
-    </div>
-    
-    <!-- Right Side: Login Form -->
-    <div class="w-full md:w-1/2 flex items-center justify-center bg-gray-50 min-h-screen">
-      <div class="w-full max-w-md space-y-8 px-4 sm:px-8 py-12">
-        
-        <!-- Medium Logo -->
-        <div class="flex flex-col items-center space-y-4">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" 
-               alt="Medium Logo" 
-               class="h-12 w-12">
-          <h2 class="text-3xl font-extrabold text-gray-900 text-center">Welcome Back</h2>
-          <p class="text-center text-sm text-gray-600 max-w-sm">
-            Join Medium to read, write, and interact with the stories that matter most to you.
-          </p>
+          </blockquote>
         </div>
-        
-        <!-- Error Alert -->
-        <% if (locals.error) { %>
-          <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md" role="alert">
+      </div>
+
+      <!-- Right Side: Login Form -->
+      <div
+        class="w-full md:w-1/2 flex items-center justify-center bg-gray-50 min-h-screen"
+      >
+        <div class="w-full max-w-md space-y-8 px-4 sm:px-8 py-12">
+          <!-- Medium Logo -->
+          <div class="flex flex-col items-center space-y-4">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg"
+              alt="Medium Logo"
+              class="h-12 w-12"
+            />
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center">
+              Welcome Back
+            </h2>
+            <p class="text-center text-sm text-gray-600 max-w-sm">
+              Join Medium to read, write, and interact with the stories that
+              matter most to you.
+            </p>
+          </div>
+
+          <!-- Error Alert -->
+          <% if (locals.error) { %>
+          <div
+            class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md"
+            role="alert"
+          >
             <div class="flex">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                <svg
+                  class="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd"
+                  />
                 </svg>
               </div>
               <div class="ml-3">
@@ -57,157 +80,200 @@
               </div>
             </div>
           </div>
-        <% } %>
+          <% } %>
 
-        <!-- Guest Access Button -->
-        <div class="space-y-5">
-          <a href="/blog?guest=true" 
-             class="group relative w-full flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200">
-            <span class="absolute left-4">
-              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-              </svg>
-            </span>
-            Continue as Guest
-          </a>
-
-          <!-- Divider -->
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-300"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-              <span class="px-4 bg-gray-50 text-gray-500">or sign in with email</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sign In Form -->
-        <form action="/login" method="POST" class="mt-8 space-y-6">
-          <div class="space-y-4">
-            <div>
-              <label for="email" class="sr-only">Email address</label>
-              <input id="email" 
-                     name="email" 
-                     type="email" 
-                     required
-                     class="appearance-none rounded-full w-full px-5 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                     placeholder="Email address">
-            </div>
-            <div>
-              <label for="password" class="sr-only">Password</label>
-              <input id="password" 
-                     name="password" 
-                     type="password" 
-                     required
-                     class="appearance-none rounded-full w-full px-5 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                     placeholder="Password">
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input id="remember_me" 
-                     name="remember_me" 
-                     type="checkbox" 
-                     class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded">
-              <label for="remember_me" class="ml-2 text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" 
-                  class="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200">
-            Sign In
-          </button>
-        </form>
-
-        <!-- Bottom Links -->
-        <div class="space-y-4 mt-8">
-          <!-- Register Link -->
-          <p class="text-center text-sm">
-            Don't have an account? 
-            <a href="/signup" class="font-medium text-black hover:text-gray-700 transition-colors duration-200">
-              Sign Up
+          <!-- Guest Access Button -->
+          <div class="space-y-5">
+            <a
+              href="/blog?guest=true"
+              class="group relative w-full flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-all duration-200"
+            >
+              <span class="absolute left-4">
+                <svg
+                  class="h-5 w-5 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </span>
+              Continue as Guest
             </a>
-          </p>
 
-          <!-- Guest Info Message -->
-          <div class="text-center">
-            <span class="inline-flex items-center px-4 py-2 rounded-full text-xs text-gray-600 bg-gray-100">
-              <svg class="h-4 w-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              Guest users can only read posts
-            </span>
+            <!-- Divider -->
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-4 bg-gray-50 text-gray-500"
+                  >or sign in with email</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Sign In Form -->
+          <form action="/login" method="POST" class="mt-8 space-y-6">
+            <div class="space-y-4">
+              <div>
+                <label for="email" class="sr-only">Email address</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value="<%= locals.values ? values.email : '' %>"
+                  class="appearance-none rounded-full w-full px-5 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="Email address"
+                />
+              </div>
+              <div>
+                <label for="password" class="sr-only">Password</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  class="appearance-none rounded-full w-full px-5 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="Password"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <input
+                  id="remember_me"
+                  name="remember_me"
+                  type="checkbox"
+                  class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                />
+                <label for="remember_me" class="ml-2 text-sm text-gray-900">
+                  Remember me
+                </label>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            >
+              Sign In
+            </button>
+          </form>
+
+          <!-- Bottom Links -->
+          <div class="space-y-4 mt-8">
+            <!-- Register Link -->
+            <p class="text-center text-sm">
+              Don't have an account?
+              <a
+                href="/signup"
+                class="font-medium text-black hover:text-gray-700 transition-colors duration-200"
+              >
+                Sign Up
+              </a>
+            </p>
+
+            <!-- Guest Info Message -->
+            <div class="text-center">
+              <span
+                class="inline-flex items-center px-4 py-2 rounded-full text-xs text-gray-600 bg-gray-100"
+              >
+                <svg
+                  class="h-4 w-4 mr-2 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Guest users can only read posts
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Add responsive styles -->
-  <style>
-    @media (max-width: 768px) {
-      .min-h-screen {
-        min-height: 100vh;
-      }
-      
-      .w-full.md\:w-1\/2 {
-        width: 100%;
-      }
-      
-      .max-w-md {
-        max-width: 100%;
-        padding: 1rem;
-      }
-      
-      .py-12 {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-      }
-      
-      .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 1.5rem;
-      }
-      
-      .rounded-full {
-        border-radius: 9999px;
-      }
-      
-      .px-4 {
-        padding-left: 1rem;
-        padding-right: 1rem;
-      }
-      
-      .py-3 {
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-      }
-    }
+    <!-- Add responsive styles -->
+    <style>
+      @media (max-width: 768px) {
+        .min-h-screen {
+          min-height: 100vh;
+        }
 
-    /* Improve touch targets on mobile */
-    @media (max-width: 640px) {
-      button, 
-      input[type="submit"],
-      .guest-button {
-        min-height: 44px;
-      }
-      
-      input[type="email"],
-      input[type="password"] {
-        font-size: 16px; /* Prevent zoom on iOS */
-      }
-    }
+        .w-full.md\:w-1\/2 {
+          width: 100%;
+        }
 
-    /* Smooth transitions */
-    .transition-all {
-      transition-property: all;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 150ms;
-    }
-  </style>
-</body>
+        .max-w-md {
+          max-width: 100%;
+          padding: 1rem;
+        }
+
+        .py-12 {
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+
+        .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+          margin-top: 1.5rem;
+        }
+
+        .rounded-full {
+          border-radius: 9999px;
+        }
+
+        .px-4 {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+
+        .py-3 {
+          padding-top: 0.75rem;
+          padding-bottom: 0.75rem;
+        }
+      }
+
+      /* Improve touch targets on mobile */
+      @media (max-width: 640px) {
+        button,
+        input[type="submit"],
+        .guest-button {
+          min-height: 44px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+          font-size: 16px; /* Prevent zoom on iOS */
+        }
+      }
+
+      /* Smooth transitions */
+      .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+      }
+    </style>
+  </body>
 </html>

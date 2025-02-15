@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: main-blog
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: PORT
+        value: 5000
+    disk:
+      name: uploads
+      mountPath: /public/uploads
+      sizeGB: 1

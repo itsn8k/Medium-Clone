@@ -7,7 +7,6 @@ const detailsSchema = new Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     username: {
@@ -15,7 +14,7 @@ const detailsSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
     email: {
       type: String,
@@ -34,38 +33,47 @@ const detailsSchema = new Schema(
       enum: ["male", "female", "other"], // Restrict to specific values
       required: true,
     },
-    rememberToken: {
-      type: String,
-      default: null
-    },
+    rememberToken: String,
     createdAt: {
       type: Date,
-      default: Date.now
+      default: Date.now,
     },
     image: {
       type: String,
-      default: "https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png" // Default Medium logo
-    }
+      default:
+        "https://miro.medium.com/v2/resize:fit:1400/1*psYl0y9DUzZWtHzFJLIvTw.png", // Default Medium logo
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    uploadedImages: [
+      {
+        url: String,
+        name: String,
+        uploadedAt: Date,
+      },
+    ],
   },
   { timestamps: true }
 );
 
 // Add password validation method
-detailsSchema.methods.validatePassword = async function(password) {
+detailsSchema.methods.validatePassword = async function (password) {
   try {
     return await bcrypt.compare(password, this.password);
   } catch (err) {
-    throw new Error('Password validation failed');
+    throw new Error("Password validation failed");
   }
 };
 
 // Add pre-save middleware to handle password updates
-detailsSchema.pre('save', async function(next) {
+detailsSchema.pre("save", async function (next) {
   // Only hash password if it's been modified or is new
-  if (!this.isModified('password')) return next();
+  if (!this.isModified("password")) return next();
 
   try {
-    const saltRounds = process.env.NODE_ENV === 'production' ? 12 : 10;
+    const saltRounds = process.env.NODE_ENV === "production" ? 12 : 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
     next();
   } catch (err) {
