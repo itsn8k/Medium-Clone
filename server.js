@@ -25,6 +25,8 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    ssl: true,
+    tlsAllowInvalidCertificates: true, // Add this for development
   })
   .then(() => {
     console.log("MongoDB Connected Successfully");
@@ -32,7 +34,10 @@ mongoose
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
-    process.exit(1);
+    // Don't exit in production, just log the error
+    if (process.env.NODE_ENV !== "production") {
+      process.exit(1);
+    }
   });
 
 // MongoDB Connection Events
@@ -1158,6 +1163,15 @@ app.get("/preview", isAuthenticated, (req, res) => {
   res.render("index-5", {
     title: "Preview Story - Medium",
     user: req.session.user,
+  });
+});
+
+// Add this error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).render("error", {
+    message: "Something broke!",
+    error: process.env.NODE_ENV === "development" ? err : {},
   });
 });
 
