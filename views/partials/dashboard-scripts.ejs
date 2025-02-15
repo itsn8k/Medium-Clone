@@ -1,0 +1,53 @@
+<script>
+function showLogoutModal(event) {
+    event.preventDefault();
+    const modal = document.getElementById('logoutModal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function hideLogoutModal() {
+    const modal = document.getElementById('logoutModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('logoutModal');
+    if (!modal.classList.contains('hidden')) {
+        const modalContent = modal.querySelector('.bg-white');
+        if (!modalContent.contains(e.target) && !e.target.closest('a[onclick="showLogoutModal(event)"]')) {
+            hideLogoutModal();
+        }
+    }
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideLogoutModal();
+    }
+});
+
+// Image upload functionality
+let selectedFile = null;
+
+function updateProfileImage(input) {
+    if (input.files && input.files[0]) {
+        selectedFile = input.files[0];
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imagePreview').src = e.target.result;
+        }
+        reader.readAsDataURL(selectedFile);
+        
+        // Show modal
+        document.getElementById('imageModal').classList.remove('hidden');
+    }
+}
+
+// Add other scripts as needed
+</script> 
