@@ -25,15 +25,9 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverApi: {
-      version: "1",
-      strict: true,
-      deprecationErrors: true,
-    },
   })
   .then(() => {
     console.log("MongoDB Connected Successfully");
-    // Initialize Express app after successful connection
     initializeApp();
   })
   .catch((err) => {

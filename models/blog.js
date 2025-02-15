@@ -25,6 +25,15 @@ const blogSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
+      enum: [
+        "Tech & Gadgets",
+        "Fashion & Beauty",
+        "News",
+        "Food & Recipes",
+        "Lifestyle",
+        "Programming",
+        "Data Science",
+      ],
       trim: true,
     },
     user: {
