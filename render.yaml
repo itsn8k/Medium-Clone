@@ -17,3 +17,5 @@ services:
       name: uploads
       mountPath: /public/uploads
       sizeGB: 1
+    domains:
+      - ssl: true
