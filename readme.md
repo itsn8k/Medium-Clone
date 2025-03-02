@@ -7,7 +7,7 @@ A **full-stack blogging platform** inspired by Medium, built using **Node.js, Ex
 ✅ **User Authentication** – Secure login/signup with JWT authentication  
 ✅ **Create & Manage Blogs** – Write, edit, and delete blog posts with a rich text editor  
 ✅ **Categories & Tags** – Organize posts based on topics for better discoverability  
-✅ **Like & Comment System** – Engage with readers through reactions and discussions  
+✅ **Like & Comment System** – React and Engage with readers through reactions and discussions  
 ✅ **Profile Management** – Users can customize their profiles with bios and images  
 ✅ **SEO-Friendly URLs** – Optimized URLs for better search engine ranking  
 ✅ **Server-Side Rendering (SSR)** – Faster performance using EJS
