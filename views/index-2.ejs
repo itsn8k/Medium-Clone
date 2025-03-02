@@ -1,467 +1,574 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= blogPost.title %> | Medium</title>
-    <link rel="stylesheet" href="/output.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="/output.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50">
+  </head>
+  <body class="bg-gray-50">
     <!-- Navbar -->
-    <nav class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
-        <div class="max-w-screen-xl mx-auto px-6">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <a href="/blog" class="flex items-center">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" 
-                         alt="Medium Logo" 
-                         class="h-8 w-8">
-                </a>
+    <nav
+      class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50"
+    >
+      <div class="max-w-screen-xl mx-auto px-6">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <a href="/blog" class="flex items-center">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg"
+              alt="Medium Logo"
+              class="h-8 w-8"
+            />
+          </a>
 
-                <!-- Right side buttons -->
-                <div class="flex items-center space-x-6">
-                    <% if (currentUserId && blogPost.user.toString() === currentUserId.toString()) { %>
-                        <a href="/blog/<%= blogPost._id %>/edit" 
-                           class="text-gray-600 hover:text-black transition-colors">
-                            <span class="sr-only">Edit post</span>
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </a>
-                        <form action="/blog/<%= blogPost._id %>?_method=DELETE" 
-                              method="POST" 
-                              class="inline"
-                              onsubmit="return confirm('Are you sure you want to delete this post?');">
-                            <button type="submit" class="text-gray-600 hover:text-red-600 transition-colors">
-                                <span class="sr-only">Delete post</span>
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </form>
-                    <% } %>
-                    <a href="/blog" class="text-gray-600 hover:text-black transition-colors">
-                        <span class="sr-only">Back to blog</span>
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
+          <!-- Right side buttons -->
+          <div class="flex items-center space-x-6">
+            <% if (currentUserId && blogPost.user.toString() ===
+            currentUserId.toString()) { %>
+            <a
+              href="/blog/<%= blogPost._id %>/edit"
+              class="text-gray-600 hover:text-black transition-colors"
+            >
+              <span class="sr-only">Edit post</span>
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </a>
+            <form
+              action="/blog/<%= blogPost._id %>?_method=DELETE"
+              method="POST"
+              class="inline"
+              onsubmit="return confirm('Are you sure you want to delete this post?');"
+            >
+              <button
+                type="submit"
+                class="text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <span class="sr-only">Delete post</span>
+                <svg
+                  class="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </form>
+            <% } %>
+            <a
+              href="/blog"
+              class="text-gray-600 hover:text-black transition-colors"
+            >
+              <span class="sr-only">Back to blog</span>
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </a>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Main Content Container -->
     <div class="container mx-auto max-w-4xl px-4 pt-20">
-        <!-- Article Header -->
-        <header class="py-12 space-y-8">
-            <!-- Category Tag -->
-            <div class="flex justify-center">
-                <span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
-                    <%= blogPost.type %>
-                </span>
-            </div>
-
-            <!-- Title -->
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center leading-tight max-w-3xl mx-auto">
-                <%= blogPost.title %>
-            </h1>
-
-            <!-- Author Info -->
-            <div class="flex items-center justify-center space-x-4">
-                <div class="flex items-center space-x-3">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg" 
-                         alt="Author" 
-                         class="h-12 w-12 rounded-full border-2 border-white shadow-sm">
-                    <div class="text-left">
-                        <a href="/user/<%= blogPost.author %>" 
-                           class="text-base font-semibold text-gray-900 hover:underline">
-                            <%= blogPost.author %>
-                        </a>
-                        <div class="flex items-center text-sm text-gray-500">
-                            <time datetime="<%= blogPost.createdAt %>">
-                                <%= new Date(blogPost.createdAt).toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                }) %>
-                            </time>
-                            <span class="mx-2">·</span>
-                            <span><%= Math.ceil(blogPost.body.split(' ').length / 200) %> min read</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Featured Image -->
-        <div class="mb-12 rounded-2xl overflow-hidden shadow-xl">
-            <img src="<%= blogPost.image %>" 
-                 alt="<%= blogPost.title %>" 
-                 class="w-full h-[400px] md:h-[500px] object-cover">
+      <!-- Article Header -->
+      <header class="py-12 space-y-8">
+        <!-- Category Tag -->
+        <div class="flex justify-center">
+          <span
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
+          >
+            <%= blogPost.type %>
+          </span>
         </div>
 
-        <!-- Article Content -->
-        <article class="mx-auto max-w-2xl space-y-8 pb-24">
-            <!-- Snippet/Introduction -->
-            <p class="text-xl md:text-2xl text-gray-600 leading-relaxed border-l-4 border-gray-200 pl-6">
-                <%= blogPost.snippet %>
-            </p>
+        <!-- Title -->
+        <h1
+          class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center leading-tight max-w-3xl mx-auto"
+        >
+          <%= blogPost.title %>
+        </h1>
 
-            <!-- Main Content -->
-            <div class="prose prose-lg prose-gray max-w-none space-y-6">
-                <%= blogPost.body.split('\n').join('<br>') %>
+        <!-- Author Info -->
+        <div class="flex items-center justify-center space-x-4">
+          <div class="flex items-center space-x-3">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Medium_logo_Monogram.svg"
+              alt="Author"
+              class="h-12 w-12 rounded-full border-2 border-white shadow-sm"
+            />
+            <div class="text-left">
+              <a
+                href="/user/<%= blogPost.author %>"
+                class="text-base font-semibold text-gray-900 hover:underline"
+              >
+                <%= blogPost.author %>
+              </a>
+              <div class="flex items-center text-sm text-gray-500">
+                <time datetime="<%= blogPost.createdAt %>">
+                  <%= new Date(blogPost.createdAt).toLocaleDateString('en-US', {
+                  month: 'long', day: 'numeric', year: 'numeric' }) %>
+                </time>
+                <span class="mx-2">·</span>
+                <span
+                  ><%= Math.ceil(blogPost.body.split(' ').length / 200) %> min
+                  read</span
+                >
+              </div>
             </div>
-        </article>
+          </div>
+        </div>
+      </header>
+
+      <!-- Featured Image -->
+      <div class="mb-12 rounded-2xl overflow-hidden shadow-xl">
+        <img
+          src="<%= blogPost.image %>"
+          alt="<%= blogPost.title %>"
+          class="w-full h-[400px] md:h-[500px] object-cover"
+        />
+      </div>
+
+      <!-- Article Content -->
+      <article class="mx-auto max-w-2xl space-y-8 pb-24">
+        <!-- Snippet/Introduction -->
+        <p
+          class="text-xl md:text-2xl text-gray-600 leading-relaxed border-l-4 border-gray-200 pl-6"
+        >
+          <%= blogPost.snippet %>
+        </p>
+
+        <!-- Main Content -->
+        <div class="prose prose-lg prose-gray max-w-none space-y-6">
+          <%- blogPost.body %>
+        </div>
+      </article>
     </div>
 
     <!-- Share Section -->
-    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-xl px-6 py-3 flex items-center space-x-6">
-        <!-- Like Button -->
-        <button 
-            id="likeButton" 
-            class="text-gray-500 hover:text-red-600 transition-colors flex items-center space-x-2"
-            data-blog-id="<%= blogPost._id %>"
-            data-liked="<%= blogPost.likes && blogPost.likes.includes(currentUserId) ? 'true' : 'false' %>"
+    <div
+      class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-xl px-6 py-3 flex items-center space-x-6"
+    >
+      <!-- Like Button -->
+      <button
+        id="likeButton"
+        class="text-gray-500 hover:text-red-600 transition-colors flex items-center space-x-2"
+        data-blog-id="<%= blogPost._id %>"
+        data-liked="<%= blogPost.likes && blogPost.likes.includes(currentUserId) ? 'true' : 'false' %>"
+      >
+        <svg
+          class="h-7 w-7"
+          fill="<%= blogPost.likes && blogPost.likes.includes(currentUserId) ? 'currentColor' : 'none' %>"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-            <svg class="h-7 w-7" fill="<%= blogPost.likes && blogPost.likes.includes(currentUserId) ? 'currentColor' : 'none' %>" 
-                 stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-            </svg>
-            <span id="likeCount" class="text-sm font-medium">
-                <%= blogPost.likes ? blogPost.likes.length : 0 %>
-            </span>
-        </button>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          />
+        </svg>
+        <span id="likeCount" class="text-sm font-medium">
+          <%= blogPost.likes ? blogPost.likes.length : 0 %>
+        </span>
+      </button>
 
-        <!-- Views Counter -->
-        <div class="flex items-center space-x-2 text-gray-500">
-            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-            </svg>
-            <span id="viewCount" class="text-sm font-medium">
-                <%= blogPost.views || 0 %>
-            </span>
-        </div>
-
-        <!-- Share Button -->
-        <button 
-            id="shareButton" 
-            class="text-gray-500 hover:text-green-600 transition-colors"
-            data-tooltip="Copy link"
+      <!-- Views Counter -->
+      <div class="flex items-center space-x-2 text-gray-500">
+        <svg
+          class="h-7 w-7"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-            </svg>
-        </button>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+          />
+        </svg>
+        <span id="viewCount" class="text-sm font-medium">
+          <%= blogPost.views || 0 %>
+        </span>
+      </div>
 
-        <!-- Share Success Message -->
-        <div id="shareMessage" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg opacity-0 transition-opacity duration-300">
-            Link copied to clipboard!
-        </div>
+      <!-- Share Button -->
+      <button
+        id="shareButton"
+        class="text-gray-500 hover:text-green-600 transition-colors"
+        data-tooltip="Copy link"
+      >
+        <svg
+          class="h-7 w-7"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+          />
+        </svg>
+      </button>
+
+      <!-- Share Success Message -->
+      <div
+        id="shareMessage"
+        class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg opacity-0 transition-opacity duration-300"
+      >
+        Link copied to clipboard!
+      </div>
     </div>
 
     <style>
-        /* Typography and Spacing */
+      /* Typography and Spacing */
+      .prose {
+        font-size: 1.125rem;
+        line-height: 1.8;
+        color: #374151;
+      }
+
+      .prose p {
+        margin-bottom: 2em;
+        white-space: pre-line;
+      }
+
+      .prose img {
+        border-radius: 1rem;
+        margin: 2.5em 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
         .prose {
-            font-size: 1.125rem;
-            line-height: 1.8;
-            color: #374151;
-        }
-        
-        .prose p {
-            margin-bottom: 2em;
-            white-space: pre-line;
+          font-size: 1.0625rem;
+          line-height: 1.75;
         }
 
-        .prose img {
-            border-radius: 1rem;
-            margin: 2.5em 0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .container {
+          padding-left: 1.25rem;
+          padding-right: 1.25rem;
         }
+      }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .prose {
-                font-size: 1.0625rem;
-                line-height: 1.75;
-            }
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
 
-            .container {
-                padding-left: 1.25rem;
-                padding-right: 1.25rem;
-            }
-        }
+      /* Better text rendering */
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
 
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
+      /* Add to your existing styles */
+      [data-tooltip] {
+        position: relative;
+      }
 
-        /* Better text rendering */
-        body {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+      [data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.5rem;
+        background-color: black;
+        color: white;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+      }
 
-        /* Add to your existing styles */
-        [data-tooltip] {
-            position: relative;
-        }
+      /* Link styles */
+      .prose a {
+        color: #111827;
+        text-decoration: none;
+        border-bottom: 1.5px solid #9ca3af;
+        padding-bottom: 1px;
+        transition: all 0.2s ease;
+      }
 
-        [data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.5rem;
-            background-color: black;
-            color: white;
-            font-size: 0.875rem;
-            border-radius: 0.375rem;
-            white-space: nowrap;
-            margin-bottom: 0.5rem;
-        }
+      .prose a:hover {
+        color: #000000;
+        border-bottom-color: #000000;
+        background-color: rgba(0, 0, 0, 0.05);
+      }
 
-        /* Link styles */
-        .prose a {
-            color: #111827;
-            text-decoration: none;
-            border-bottom: 1.5px solid #9CA3AF;
-            padding-bottom: 1px;
-            transition: all 0.2s ease;
-        }
+      /* External link styles (for http/https links) */
+      .prose a[href^="http"] {
+        color: #111827;
+        text-decoration: none;
+        border-bottom: 1.5px solid #9ca3af;
+        padding: 0 2px;
+        margin: 0 1px;
+        border-radius: 2px;
+        word-break: break-word;
+      }
 
-        .prose a:hover {
-            color: #000000;
-            border-bottom-color: #000000;
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+      .prose a[href^="http"]:hover {
+        color: #000000;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-bottom-color: #000000;
+      }
 
-        /* External link styles (for http/https links) */
-        .prose a[href^="http"] {
-            color: #111827;
-            text-decoration: none;
-            border-bottom: 1.5px solid #9CA3AF;
-            padding: 0 2px;
-            margin: 0 1px;
-            border-radius: 2px;
-            word-break: break-word;
-        }
+      .prose a[href^="http"]::after {
+        content: "↗";
+        display: inline-block;
+        margin-left: 2px;
+        font-size: 0.875em;
+        opacity: 0.6;
+        transition: all 0.2s ease;
+      }
 
-        .prose a[href^="http"]:hover {
-            color: #000000;
-            background-color: rgba(0, 0, 0, 0.05);
-            border-bottom-color: #000000;
-        }
+      .prose a[href^="http"]:hover::after {
+        transform: translate(1px, -1px);
+        opacity: 1;
+      }
 
-        .prose a[href^="http"]::after {
-            content: "↗";
-            display: inline-block;
-            margin-left: 2px;
-            font-size: 0.875em;
-            opacity: 0.6;
-            transition: all 0.2s ease;
-        }
+      /* Add focus styles for accessibility */
+      .prose a:focus {
+        outline: 2px solid #000000;
+        outline-offset: 2px;
+        border-radius: 2px;
+      }
 
-        .prose a[href^="http"]:hover::after {
-            transform: translate(1px, -1px);
-            opacity: 1;
-        }
+      /* Better typography */
+      .prose {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
 
-        /* Add focus styles for accessibility */
-        .prose a:focus {
-            outline: 2px solid #000000;
-            outline-offset: 2px;
-            border-radius: 2px;
-        }
+      .prose h2 {
+        font-size: 1.5em;
+        margin-top: 2em;
+        margin-bottom: 1em;
+        font-weight: 600;
+      }
 
-        /* Better typography */
-        .prose {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+      .prose h3 {
+        font-size: 1.25em;
+        margin-top: 1.6em;
+        margin-bottom: 0.8em;
+        font-weight: 600;
+      }
 
-        .prose h2 {
-            font-size: 1.5em;
-            margin-top: 2em;
-            margin-bottom: 1em;
-            font-weight: 600;
-        }
+      /* Code blocks */
+      .prose pre {
+        background-color: #f3f4f6;
+        padding: 1em;
+        border-radius: 0.5em;
+        overflow-x: auto;
+      }
 
-        .prose h3 {
-            font-size: 1.25em;
-            margin-top: 1.6em;
-            margin-bottom: 0.8em;
-            font-weight: 600;
-        }
+      .prose code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 0.875em;
+        background-color: #f3f4f6;
+        padding: 0.2em 0.4em;
+        border-radius: 0.25em;
+      }
 
-        /* Code blocks */
-        .prose pre {
-            background-color: #f3f4f6;
-            padding: 1em;
-            border-radius: 0.5em;
-            overflow-x: auto;
-        }
+      /* Add these styles for auto-detected links */
+      .prose a[href^="http"] {
+        color: #2563eb;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        word-break: break-word;
+      }
 
-        .prose code {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            font-size: 0.875em;
-            background-color: #f3f4f6;
-            padding: 0.2em 0.4em;
-            border-radius: 0.25em;
-        }
+      .prose a[href^="http"]:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+      }
 
-        /* Add these styles for auto-detected links */
-        .prose a[href^="http"] {
-            color: #2563eb;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            word-break: break-word;
-        }
+      .prose a[href^="http"]::after {
+        content: "↗";
+        display: inline-block;
+        margin-left: 2px;
+        font-size: 0.875em;
+        transition: transform 0.2s ease;
+      }
 
-        .prose a[href^="http"]:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
-        }
-
-        .prose a[href^="http"]::after {
-            content: "↗";
-            display: inline-block;
-            margin-left: 2px;
-            font-size: 0.875em;
-            transition: transform 0.2s ease;
-        }
-
-        .prose a[href^="http"]:hover::after {
-            transform: translate(1px, -1px);
-        }
+      .prose a[href^="http"]:hover::after {
+        transform: translate(1px, -1px);
+      }
     </style>
 
     <!-- Add this script before closing body tag -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const likeButton = document.getElementById('likeButton');
-        const likeCount = document.getElementById('likeCount');
-        const shareButton = document.getElementById('shareButton');
-        const shareMessage = document.getElementById('shareMessage');
+      document.addEventListener("DOMContentLoaded", function () {
+        const likeButton = document.getElementById("likeButton");
+        const likeCount = document.getElementById("likeCount");
+        const shareButton = document.getElementById("shareButton");
+        const shareMessage = document.getElementById("shareMessage");
         const blogId = likeButton.dataset.blogId;
 
         // Increment view count on page load
-        fetch(`/blog/${blogId}/view`, { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('viewCount').textContent = data.views;
-            });
+        fetch(`/blog/${blogId}/view`, { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("viewCount").textContent = data.views;
+          });
 
         // Handle likes
-        likeButton.addEventListener('click', function() {
-            fetch(`/blog/${blogId}/like`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    likeCount.textContent = data.likes;
-                    const svg = likeButton.querySelector('svg');
-                    if (data.isLiked) {
-                        svg.setAttribute('fill', 'currentColor');
-                        likeButton.classList.add('text-red-600');
-                    } else {
-                        svg.setAttribute('fill', 'none');
-                        likeButton.classList.remove('text-red-600');
-                    }
-                });
+        likeButton.addEventListener("click", function () {
+          fetch(`/blog/${blogId}/like`, { method: "POST" })
+            .then((response) => response.json())
+            .then((data) => {
+              likeCount.textContent = data.likes;
+              const svg = likeButton.querySelector("svg");
+              if (data.isLiked) {
+                svg.setAttribute("fill", "currentColor");
+                likeButton.classList.add("text-red-600");
+              } else {
+                svg.setAttribute("fill", "none");
+                likeButton.classList.remove("text-red-600");
+              }
+            });
         });
 
         // Handle share button
-        shareButton.addEventListener('click', function() {
-            // Copy current URL to clipboard
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                // Show success message
-                shareMessage.classList.add('opacity-100');
-                setTimeout(() => {
-                    shareMessage.classList.remove('opacity-100');
-                }, 2000);
-            });
+        shareButton.addEventListener("click", function () {
+          // Copy current URL to clipboard
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            // Show success message
+            shareMessage.classList.add("opacity-100");
+            setTimeout(() => {
+              shareMessage.classList.remove("opacity-100");
+            }, 2000);
+          });
         });
 
         // Function to convert URLs to clickable links
         function linkifyText() {
-            const articleContent = document.querySelector('.prose');
-            if (!articleContent) return;
+          const articleContent = document.querySelector(".prose");
+          if (!articleContent) return;
 
-            // Regular expression to match URLs
-            const urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g;
+          // Regular expression to match URLs
+          const urlRegex = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g;
 
-            // Get all text nodes in the article
-            const walk = document.createTreeWalker(
-                articleContent,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
+          // Get all text nodes in the article
+          const walk = document.createTreeWalker(
+            articleContent,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+          );
 
-            const textNodes = [];
-            let node;
-            while (node = walk.nextNode()) {
-                if (node.parentElement.tagName !== 'A' && // Skip if parent is already a link
-                    !node.parentElement.closest('pre') && // Skip code blocks
-                    !node.parentElement.closest('code')) { // Skip inline code
-                    textNodes.push(node);
-                }
+          const textNodes = [];
+          let node;
+          while ((node = walk.nextNode())) {
+            if (
+              node.parentElement.tagName !== "A" && // Skip if parent is already a link
+              !node.parentElement.closest("pre") && // Skip code blocks
+              !node.parentElement.closest("code")
+            ) {
+              // Skip inline code
+              textNodes.push(node);
             }
+          }
 
-            // Process each text node
-            textNodes.forEach(textNode => {
-                const text = textNode.nodeValue;
-                if (urlRegex.test(text)) {
-                    const fragment = document.createDocumentFragment();
-                    let lastIdx = 0;
-                    let match;
+          // Process each text node
+          textNodes.forEach((textNode) => {
+            const text = textNode.nodeValue;
+            if (urlRegex.test(text)) {
+              const fragment = document.createDocumentFragment();
+              let lastIdx = 0;
+              let match;
 
-                    // Reset regex
-                    urlRegex.lastIndex = 0;
+              // Reset regex
+              urlRegex.lastIndex = 0;
 
-                    while ((match = urlRegex.exec(text)) !== null) {
-                        // Add text before the link
-                        if (match.index > lastIdx) {
-                            fragment.appendChild(document.createTextNode(text.substring(lastIdx, match.index)));
-                        }
-
-                        // Create the link
-                        const link = document.createElement('a');
-                        link.href = match[0];
-                        link.textContent = match[0];
-                        link.target = "_blank"; // Open in new tab
-                        link.rel = "noopener noreferrer"; // Security best practice
-                        link.className = "text-blue-600 hover:text-blue-800 hover:underline";
-                        fragment.appendChild(link);
-
-                        lastIdx = match.index + match[0].length;
-                    }
-
-                    // Add remaining text
-                    if (lastIdx < text.length) {
-                        fragment.appendChild(document.createTextNode(text.substring(lastIdx)));
-                    }
-
-                    // Replace the original text node with the fragment
-                    textNode.parentNode.replaceChild(fragment, textNode);
+              while ((match = urlRegex.exec(text)) !== null) {
+                // Add text before the link
+                if (match.index > lastIdx) {
+                  fragment.appendChild(
+                    document.createTextNode(
+                      text.substring(lastIdx, match.index)
+                    )
+                  );
                 }
-            });
+
+                // Create the link
+                const link = document.createElement("a");
+                link.href = match[0];
+                link.textContent = match[0];
+                link.target = "_blank"; // Open in new tab
+                link.rel = "noopener noreferrer"; // Security best practice
+                link.className =
+                  "text-blue-600 hover:text-blue-800 hover:underline";
+                fragment.appendChild(link);
+
+                lastIdx = match.index + match[0].length;
+              }
+
+              // Add remaining text
+              if (lastIdx < text.length) {
+                fragment.appendChild(
+                  document.createTextNode(text.substring(lastIdx))
+                );
+              }
+
+              // Replace the original text node with the fragment
+              textNode.parentNode.replaceChild(fragment, textNode);
+            }
+          });
         }
 
         // Run the linkify function after page loads
         linkifyText();
-    });
+      });
     </script>
-</body>
+  </body>
 </html>

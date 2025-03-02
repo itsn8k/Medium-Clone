@@ -14,6 +14,7 @@ const app = express();
 const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const crypto = require("crypto");
+const sanitizeHtml = require("sanitize-html");
 
 // Dynamic port handling
 const PORT = process.env.PORT || 5000;
@@ -25,19 +26,21 @@ mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    retryWrites: true,
+    w: "majority",
     ssl: true,
-    tlsAllowInvalidCertificates: true, // Add this for development
+    authSource: "admin",
+    serverSelectionTimeoutMS: 60000, // Increase timeout
+    socketTimeoutMS: 45000,
   })
   .then(() => {
     console.log("MongoDB Connected Successfully");
+    // Initialize Express app after successful connection
     initializeApp();
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
-    // Don't exit in production, just log the error
-    if (process.env.NODE_ENV !== "production") {
-      process.exit(1);
-    }
+    process.exit(1);
   });
 
 // MongoDB Connection Events
@@ -69,31 +72,10 @@ function initializeApp() {
       cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
-        sameSite: "lax",
         maxAge: 24 * 60 * 60 * 1000,
       },
     })
   );
-
-  // Add security headers
-  app.use((req, res, next) => {
-    res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader("X-Frame-Options", "DENY");
-    res.setHeader("X-XSS-Protection", "1; mode=block");
-    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    next();
-  });
-
-  // Force HTTPS in production
-  if (process.env.NODE_ENV === "production") {
-    app.use((req, res, next) => {
-      if (req.header("x-forwarded-proto") !== "https") {
-        res.redirect(`https://${req.header("host")}${req.url}`);
-      } else {
-        next();
-      }
-    });
-  }
 
   // Set up view engine and static files
   app.set("view engine", "ejs");
@@ -665,6 +647,22 @@ app.post("/blog", upload.single("image"), async (req, res) => {
       comments: [],
     });
 
+    // Sanitize the body
+    const sanitizedBody = sanitizeHtml(body, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+        "img",
+        "h1",
+        "h2",
+        "h3",
+      ]),
+      allowedAttributes: {
+        "*": ["style", "class"],
+        img: ["src", "alt"],
+      },
+    });
+
+    newBlogPost.body = sanitizedBody;
+
     await newBlogPost.save();
     res.render("bs", {
       title: "Blog Post Created",
@@ -862,6 +860,22 @@ app.put("/blog/:id", upload.single("image"), requireAuth, async (req, res) => {
         }
       }
     }
+
+    // Sanitize the body
+    const sanitizedBody = sanitizeHtml(body, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+        "img",
+        "h1",
+        "h2",
+        "h3",
+      ]),
+      allowedAttributes: {
+        "*": ["style", "class"],
+        img: ["src", "alt"],
+      },
+    });
+
+    updateData.body = sanitizedBody;
 
     const updatedPost = await BlogPost.findByIdAndUpdate(blogId, updateData, {
       new: true,
@@ -1134,6 +1148,22 @@ app.post("/create-post", upload.single("image"), async (req, res) => {
       comments: [],
     });
 
+    // Sanitize the content
+    const sanitizedContent = sanitizeHtml(content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+        "img",
+        "h1",
+        "h2",
+        "h3",
+      ]),
+      allowedAttributes: {
+        "*": ["style", "class"],
+        img: ["src", "alt"],
+      },
+    });
+
+    newPost.content = sanitizedContent;
+
     await newPost.save();
 
     res.json({
@@ -1163,15 +1193,6 @@ app.get("/preview", isAuthenticated, (req, res) => {
   res.render("index-5", {
     title: "Preview Story - Medium",
     user: req.session.user,
-  });
-});
-
-// Add this error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).render("error", {
-    message: "Something broke!",
-    error: process.env.NODE_ENV === "development" ? err : {},
   });
 });
 
