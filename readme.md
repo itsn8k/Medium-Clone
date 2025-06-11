@@ -1,6 +1,6 @@
 # Medium-Clone (In Development)
 
-A **full-stack blogging platform** inspired by Medium, built using **Node.js, Express.js, MongoDB, and EJS**. This project allows users to create, edit, and publish blog posts while ensuring a smooth and engaging reading experience.
+A **full-stack blogging platform** inspired by Medium, built using **Node.js, Express.js, MongoDB, JWT and EJS**. This project allows users to create, edit, and publish blog posts while ensuring a smooth and engaging reading experience.
 
 ## 🚀 Features
 
